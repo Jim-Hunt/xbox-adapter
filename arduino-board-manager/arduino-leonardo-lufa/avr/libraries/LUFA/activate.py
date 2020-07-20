@@ -22,7 +22,9 @@ def absolute_path(path):
 # File path constants #
 #---------------------#
 
-ARDUINO_CORE_DIR = 'hardware/arduino/avr/cores/arduino/'
+# ARDUINO_CORE_DIR = 'hardware/arduino/avr/cores/arduino/'
+# Activate for just arduino-leonardo-lufa from arduino-leonardo-lufa/avr/libraries
+ARDUINO_CORE_DIR = 'cores/arduino/'
 
 FILES_TO_BLOCK = [
     'CDC.cpp',
@@ -79,6 +81,7 @@ def unhide_whole_file(path):
     unhide_section_in_file(path)
 
 def hide_section_in_file(path, section):
+    print(path)
     """
     Hide section
     If section is a falsey value, the whole file will be hidden
@@ -187,7 +190,10 @@ def get_arduino_ide_version():
 def main_common(block_and_hide):
     """Common functionality for activate and deactivate scripts"""
 
-    arduino_ide_version = get_arduino_ide_version()
+    # Don't check when activating for just arduino-leonardo-lufa from 
+    # arduino-leonardo-lufa/avr/libraries
+    # arduino_ide_version = get_arduino_ide_version()
+    arduino_ide_version = "1.8.3"
 
     if not arduino_ide_version in SUPPORTED_ARDUINO_IDE_VERSIONS:
         print(('WARNING: Arduino version {} has not been tested to be compatible.' \
