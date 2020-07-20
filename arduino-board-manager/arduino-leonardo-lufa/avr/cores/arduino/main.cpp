@@ -36,8 +36,16 @@ int main(void)
 
 	initVariant();
 
+//=====================================
+//== This section is hidden by LUFA! ==
+//=====================================
+#if 0
+
 #if defined(USBCON)
 	USBDevice.attach();
+#endif
+
+END OF HIDDEN SECTION
 #endif
 	
 	setup();

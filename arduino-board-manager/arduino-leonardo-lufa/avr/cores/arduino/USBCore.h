@@ -1,4 +1,9 @@
 
+//=====================================
+//== This section is hidden by LUFA! ==
+//=====================================
+#if 0
+
 // Copyright (c) 2010, Peter Barrett 
 /*
 ** Permission to use, copy, modify, and/or distribute this software for  
@@ -301,4 +306,7 @@ typedef struct
 #define NEW_LUFA_SIGNATURE 0xDCFB
 #endif
 
+#endif
+
+END OF HIDDEN SECTION
 #endif

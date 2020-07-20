@@ -1,4 +1,9 @@
 
+//=====================================
+//== This section is hidden by LUFA! ==
+//=====================================
+#if 0
+
 
 /* Copyright (c) 2011, Peter Barrett  
 **  
@@ -300,3 +305,6 @@ int32_t Serial_::readBreak() {
 Serial_ Serial;
 
 #endif /* if defined(USBCON) */
+
+END OF HIDDEN SECTION
+#endif

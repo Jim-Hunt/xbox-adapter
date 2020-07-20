@@ -1,3 +1,8 @@
+
+//=====================================
+//== This section is hidden by LUFA! ==
+//=====================================
+#if 0
 /*
   PluggableUSB.cpp
   Copyright (c) 2015 Arduino LLC
@@ -113,3 +118,6 @@ PluggableUSB_::PluggableUSB_() : lastIf(CDC_ACM_INTERFACE + CDC_INTERFACE_COUNT)
 #endif
 
 #endif /* if defined(USBCON) */
+
+END OF HIDDEN SECTION
+#endif

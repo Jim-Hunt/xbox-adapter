@@ -1,3 +1,8 @@
+
+//=====================================
+//== This section is hidden by LUFA! ==
+//=====================================
+#if 0
 /*
   USBAPI.h
   Copyright (c) 2005-2014 Arduino.  All right reserved.
@@ -207,3 +212,6 @@ void USB_Flush(uint8_t ep);
 #endif
 
 #endif /* if defined(USBCON) */
+
+END OF HIDDEN SECTION
+#endif

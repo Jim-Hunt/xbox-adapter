@@ -1,3 +1,8 @@
+
+//=====================================
+//== This section is hidden by LUFA! ==
+//=====================================
+#if 0
 /*
    Copyright (c) 2011, Peter Barrett
    Copyright (c) 2015, Arduino LLC
@@ -44,3 +49,5 @@
 #define IMANUFACTURER   1
 #define IPRODUCT        2
 #define ISERIAL         3
+END OF HIDDEN SECTION
+#endif

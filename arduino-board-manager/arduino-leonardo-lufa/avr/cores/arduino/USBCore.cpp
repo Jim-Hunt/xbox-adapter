@@ -1,4 +1,9 @@
 
+//=====================================
+//== This section is hidden by LUFA! ==
+//=====================================
+#if 0
+
 
 /* Copyright (c) 2010, Peter Barrett
 ** Sleep/Wakeup support added by Michael Dreher
@@ -861,3 +866,6 @@ bool USBDevice_::isSuspended()
 
 
 #endif /* if defined(USBCON) */
+
+END OF HIDDEN SECTION
+#endif

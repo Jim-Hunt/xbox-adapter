@@ -1,3 +1,8 @@
+
+//=====================================
+//== This section is hidden by LUFA! ==
+//=====================================
+#if 0
 /*
   PluggableUSB.h
   Copyright (c) 2015 Arduino LLC
@@ -71,4 +76,7 @@ PluggableUSB_& PluggableUSB();
 
 #endif
 
+#endif
+
+END OF HIDDEN SECTION
 #endif
