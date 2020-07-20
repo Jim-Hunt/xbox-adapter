@@ -81,7 +81,6 @@ def unhide_whole_file(path):
     unhide_section_in_file(path)
 
 def hide_section_in_file(path, section):
-    print(path)
     """
     Hide section
     If section is a falsey value, the whole file will be hidden
