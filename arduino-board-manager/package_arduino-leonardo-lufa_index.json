@@ -11,8 +11,8 @@
                "category": "Contributed",
                "url": "https://raw.githubusercontent.com/jim-hunt/xbox-adapter/develop/arduino-board-manager/arduino-leonardo-lufa.0.1.0.zip",
                "archiveFileName": "arduino-leonardo-lufa.0.1.0.zip",
-               "checksum": "SHA-256:3183ac289c1a13b99186caecc6006b51e064c3ca37cdbc32aedf1bc4b4295de5",
-               "size": "13250022",
+               "checksum": "SHA-256:775fb1aea44d54b2d998ef04dcf034f8bf0dd89f07b54a3dd2fcb349b23fe571",
+               "size": "13250023",
                "help": {
                   "online": "https://github.com/jim-hunt/xbox-adapter/arduino-board-manager/"
                },

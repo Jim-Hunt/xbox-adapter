@@ -4,7 +4,7 @@ menu.cpu=Processor
 
 ##############################################################
 
-leonardo.name=Arduino Leonardo w/ LUFA
+leonardo.name=Arduino Leonardo with LUFA
 leonardo.vid.0=0x2341
 leonardo.pid.0=0x0036
 leonardo.vid.1=0x2341
@@ -43,7 +43,7 @@ leonardo.build.extra_flags={build.usb_flags}
 
 ##############################################################
 
-micro.name=Arduino Micro w/ LUFA
+micro.name=Arduino Micro with LUFA
 
 micro.vid.0=0x2341
 micro.pid.0=0x0037
