@@ -1,0 +1,5 @@
+{
+    "board": "Arduino Leonardo with LUFA:avr:leonardo",
+    "sketch": "XboxAdapter.ino",
+    "port": "/dev/tty.usbmodem14101"
+}
