@@ -4,21 +4,21 @@
 typedef struct
 {
    uint8_t startByte;
-   uint8_t bLength;
-   uint8_t dButtons;
+   uint8_t byteLength;
+   uint8_t DigitalButtons;
    uint8_t reserved;
    uint8_t A;
    uint8_t B;
    uint8_t X;
    uint8_t Y;
-   uint8_t BLACK;
-   uint8_t WHITE;
-   uint8_t L;
-   uint8_t R;
-   int16_t leftHatX;
-   int16_t leftHatY;
-   int16_t rightHatX;
-   int16_t rightHatY;
+   uint8_t Black;
+   uint8_t White;
+   uint8_t LeftTrigger;
+   uint8_t RightTrigger;
+   int16_t LeftHatX;
+   int16_t LeftHatY;
+   int16_t RightHatX;
+   int16_t RightHatY;
 } USB_XboxDuke_Data_t;
 
 USB_XboxDuke_Data_t XboxDukePrevReportINBuffer;
@@ -43,14 +43,14 @@ uint8_t const DUKE_USB_DESCRIPTOR_DEVICE[] PROGMEM = {
 };
 
 uint8_t const DUKE_USB_DESCRIPTOR_CONFIGURATION[] PROGMEM = {
-   0x09, 0x02, 0x20, 0x00, 0x01, 0x01,	0x00,	0x80, 
-   0xFA,	0x09, 0x04, 0x00, 0x00, 0x02, 0x58, 0x42, 
+   0x09, 0x02, 0x20, 0x00, 0x01, 0x01, 0x00, 0x80, 
+   0xFA, 0x09, 0x04, 0x00, 0x00, 0x02, 0x58, 0x42, 
    0x00, 0x00, 0x07, 0x05, 0x81, 0x03, 0x20, 0x00, 
    0x04, 0x07, 0x05, 0x02, 0x03, 0x20, 0x00, 0x04 
 };
 
 uint8_t const DUKE_XID_DESCRIPTOR[] PROGMEM = {
-   0x10, 0x42, 0x00, 0x01,	0x01, 0x02, 0x14, 0x06, 
+   0x10, 0x42, 0x00, 0x01, 0x01, 0x02, 0x14, 0x06, 
    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF 
 };
 
@@ -144,22 +144,22 @@ bool CALLBACK_HID_Device_CreateHIDReport(USB_ClassInfo_HID_Device_t *const HIDIn
 {
    USB_XboxDuke_Data_t *Data = (USB_XboxDuke_Data_t *)ReportData;
 
-   Data->startByte   = 0x00;
-   Data->bLength     = sizeof(USB_XboxDuke_Data_t);
-   Data->dButtons    = XboxDuke.dButtons;
-   Data->reserved    = 0x00;
-   Data->A           = XboxDuke.A;
-   Data->B           = XboxDuke.B;
-   Data->X           = XboxDuke.X;
-   Data->Y           = XboxDuke.Y;
-   Data->BLACK       = XboxDuke.BLACK;
-   Data->WHITE       = XboxDuke.WHITE;
-   Data->L 	         = XboxDuke.L;
-   Data->R           = XboxDuke.R;
-   Data->leftHatX    = XboxDuke.leftHatX;
-   Data->leftHatY    = XboxDuke.leftHatY;
-   Data->rightHatX   = XboxDuke.rightHatX;
-   Data->rightHatY   = XboxDuke.rightHatY;
+   Data->startByte         = 0x00;
+   Data->byteLength        = sizeof(USB_XboxDuke_Data_t);
+   Data->DigitalButtons    = XboxDuke.DigitalButtons;
+   Data->reserved          = 0x00;
+   Data->A                 = XboxDuke.A;
+   Data->B                 = XboxDuke.B;
+   Data->X                 = XboxDuke.X;
+   Data->Y                 = XboxDuke.Y;
+   Data->Black             = XboxDuke.Black;
+   Data->White             = XboxDuke.White;
+   Data->LeftTrigger       = XboxDuke.LeftTrigger;
+   Data->RightTrigger      = XboxDuke.RightTrigger;
+   Data->LeftHatX          = XboxDuke.LeftHatX;
+   Data->LeftHatY          = XboxDuke.LeftHatY;
+   Data->RightHatX         = XboxDuke.RightHatX;
+   Data->RightHatY         = XboxDuke.RightHatY;
 
    *ReportSize = sizeof(USB_XboxDuke_Data_t);
 
@@ -176,9 +176,9 @@ void CALLBACK_HID_Device_ProcessHIDReport(USB_ClassInfo_HID_Device_t *const HIDI
    /* Only expect one HID report from the host and this is the rumble levels 
       which is 6 bytes long. See http://euc.jp/periphs/xbox-controller.en.html. */
    if (ReportSize == 0x06) {
-      XboxDuke.leftRumble     = ((uint8_t *)ReportData)[3];
-      XboxDuke.rightRumble    = ((uint8_t *)ReportData)[5];
-      XboxDuke.updateRumble   = true;
+      XboxDuke.LeftRumble     = ((uint8_t *)ReportData)[3];
+      XboxDuke.RightRumble    = ((uint8_t *)ReportData)[5];
+      XboxDuke.UpdateRumble   = true;
    }
 }
 
@@ -252,21 +252,21 @@ void XboxDuke_USBTask(void)
       Endpoint_ClearOUT();
 
       if (ReportData[1] == 0x06) {
-         XboxDuke.leftRumble     = ReportData[3];
-         XboxDuke.rightRumble    = ReportData[5];
-         XboxDuke.updateRumble   = true;
+         XboxDuke.LeftRumble     = ReportData[3];
+         XboxDuke.RightRumble    = ReportData[5];
+         XboxDuke.UpdateRumble   = true;
       }
    }
 
    Endpoint_SelectEndpoint(ep);
 
    /* Turn off rumble on an in-game-reset button combo. */
-   // if (XboxDuke.dButtons & START_BTN && 
-   //     XboxDuke.dButtons & BACK_BTN && 
-   //     XboxDuke.L > 0x00 &&
-   //     XboxDuke.R > 0x00) {
-   //    XboxDuke.leftRumble     = 0x00; 
-   //    XboxDuke.rightRumble    = 0x00;
-   //    XboxDuke.updateRumble   = true;
+   // if (XboxDuke.DigitalButtons & D_START && 
+   //     XboxDuke.DigitalButtons & D_BACK && 
+   //     XboxDuke.LeftTrigger > 0x00 &&
+   //     XboxDuke.RightTrigger > 0x00) {
+   //    XboxDuke.LeftRumble     = 0x00; 
+   //    XboxDuke.RightRumble    = 0x00;
+   //    XboxDuke.UpdateRumble   = true;
    // }
 }

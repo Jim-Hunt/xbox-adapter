@@ -7,39 +7,38 @@
 #include <avr/wdt.h>
 #include <avr/power.h>
 
-
-#define DPAD_UP      0b00000001
-#define DPAD_DOWN    0b00000010
-#define DPAD_LEFT    0b00000100
-#define DPAD_RIGHT   0b00001000
-#define START_BTN    0b00010000
-#define BACK_BTN     0b00100000
-#define LHAT_BTN     0b01000000
-#define RHAT_BTN     0b10000000
-
+#define D_UP         0b00000001
+#define D_DOWN       0b00000010
+#define D_LEFT       0b00000100
+#define D_RIGHT      0b00001000
+#define D_START      0b00010000
+#define D_BACK       0b00100000
+#define D_LEFT_HAT   0b01000000
+#define D_RIGHT_HAT  0b10000000
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+
 typedef struct
 {
-   uint8_t dButtons;
+   uint8_t DigitalButtons;
    uint8_t A;
    uint8_t B;
    uint8_t X;
    uint8_t Y;
-   uint8_t BLACK;
-   uint8_t WHITE;
-   uint8_t L;
-   uint8_t R;
-   int16_t leftHatX;
-   int16_t leftHatY;
-   int16_t rightHatX;
-   int16_t rightHatY;
-   uint8_t leftRumble;
-   uint8_t rightRumble;
-   bool updateRumble;
+   uint8_t Black;
+   uint8_t White;
+   uint8_t LeftTrigger;
+   uint8_t RightTrigger;
+   int16_t LeftHatX;
+   int16_t LeftHatY;
+   int16_t RightHatX;
+   int16_t RightHatY;
+   uint8_t LeftRumble;
+   uint8_t RightRumble;
+   bool UpdateRumble;
    bool XboxDukeConnected;
 } XboxDuke_Data_t;
 
