@@ -25,7 +25,7 @@ void loop()
    bool gamepadConnected = false;
 
    if (XboxOne.XboxOneConnected) {
-      /* Prepare stick, trigger and button values from the controller. */
+      /* Button, trigger and hat values FROM the gamepad. */
       uint8_t digitalButtons = 0b00000000;
 
       if (XboxOne.getButtonPress(UP))     digitalButtons |= D_UP;
@@ -51,7 +51,7 @@ void loop()
       XboxDuke.RightHatX      = XboxOne.getAnalogHat(RightHatX);
       XboxDuke.RightHatY      = XboxOne.getAnalogHat(RightHatY);
 
-      /* Pass rumble vaules to the controller. */
+      /* Rumble values TO the gamepad. */
       if (XboxDuke.UpdateRumble) {
          if (XboxDuke.LeftRumble == 0x00 && XboxDuke.RightRumble == 0x00) {
             XboxOne.setRumbleOff();
