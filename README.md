@@ -1,6 +1,6 @@
 # Xbox Adapter
 
-An Arduino sketch for the Leonardo board with a USB Host Shield that enables a wired Xbox One controller be used with an original Xbox console.
+A sketch for the Arduino Leonardo and USB Host Shield to use a wired Xbox One controller on an original Xbox.
 
 <!--
 
