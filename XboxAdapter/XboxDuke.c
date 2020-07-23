@@ -1,8 +1,6 @@
 #include "XboxDuke.h"
 
-
-typedef struct
-{
+typedef struct {
    uint8_t startByte;
    uint8_t byteLength;
    uint8_t DigitalButtons;
@@ -25,55 +23,45 @@ USB_XboxDuke_Data_t XboxDukePrevReportINBuffer;
 
 USB_ClassInfo_HID_Device_t XboxDuke_HID_Interface = {
    .Config = {
-      .InterfaceNumber        = 0x00,
-      .ReportINEndpoint       = {
-         .Address             = 0x81,
-         .Size                = sizeof(USB_XboxDuke_Data_t),
-         .Banks               = 1
-      },
+      .InterfaceNumber  = 0x00,
+      .ReportINEndpoint = {
+         .Address = 0x81,
+         .Size    = sizeof(USB_XboxDuke_Data_t),
+         .Banks   = 1},
       .PrevReportINBuffer     = &XboxDukePrevReportINBuffer,
       .PrevReportINBufferSize = sizeof(USB_XboxDuke_Data_t),
-   }
-};
+   }};
 
 uint8_t const DUKE_USB_DESCRIPTOR_DEVICE[] PROGMEM = {
-   0x12, 0x01, 0x10, 0x01, 0x00, 0x00, 0x00, 0x20, 
-   0x5E, 0x04, 0x89, 0x02, 0x21, 0x01, 0x00, 0x00, 
-   0x00, 0x01 
-};
+   0x12, 0x01, 0x10, 0x01, 0x00, 0x00, 0x00, 0x20,
+   0x5E, 0x04, 0x89, 0x02, 0x21, 0x01, 0x00, 0x00,
+   0x00, 0x01};
 
 uint8_t const DUKE_USB_DESCRIPTOR_CONFIGURATION[] PROGMEM = {
-   0x09, 0x02, 0x20, 0x00, 0x01, 0x01, 0x00, 0x80, 
-   0xFA, 0x09, 0x04, 0x00, 0x00, 0x02, 0x58, 0x42, 
-   0x00, 0x00, 0x07, 0x05, 0x81, 0x03, 0x20, 0x00, 
-   0x04, 0x07, 0x05, 0x02, 0x03, 0x20, 0x00, 0x04 
-};
+   0x09, 0x02, 0x20, 0x00, 0x01, 0x01, 0x00, 0x80,
+   0xFA, 0x09, 0x04, 0x00, 0x00, 0x02, 0x58, 0x42,
+   0x00, 0x00, 0x07, 0x05, 0x81, 0x03, 0x20, 0x00,
+   0x04, 0x07, 0x05, 0x02, 0x03, 0x20, 0x00, 0x04};
 
 uint8_t const DUKE_XID_DESCRIPTOR[] PROGMEM = {
-   0x10, 0x42, 0x00, 0x01, 0x01, 0x02, 0x14, 0x06, 
-   0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF 
-};
+   0x10, 0x42, 0x00, 0x01, 0x01, 0x02, 0x14, 0x06,
+   0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
 uint8_t const DUKE_XID_CAPABILITIES_IN[] PROGMEM = {
    0x00, 0x14, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,
-   0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 
-   0xFF, 0xFF, 0xFF, 0xFF
-};
+   0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+   0xFF, 0xFF, 0xFF, 0xFF};
 
 uint8_t const DUKE_XID_CAPABILITIES_OUT[] PROGMEM = {
-   0x00, 0x06, 0xFF, 0xFF, 0xFF, 0xFF 
-};
-
+   0x00, 0x06, 0xFF, 0xFF, 0xFF, 0xFF};
 
 void EVENT_USB_Device_Connect(void)
 {
 }
 
-
 void EVENT_USB_Device_Disconnect(void)
 {
 }
-
 
 void EVENT_USB_Device_ConfigurationChanged(void)
 {
@@ -81,11 +69,10 @@ void EVENT_USB_Device_ConfigurationChanged(void)
 
    /* Host Out endpoint opened manually for Duke. */
    Endpoint_ConfigureEndpoint(0x02, EP_TYPE_INTERRUPT, 0x06, 1);
-   
+
    /* Enable Start-Of-Frame events. */
    USB_Device_EnableSOFEvents();
 }
-
 
 void EVENT_USB_Device_ControlRequest(void)
 {
@@ -95,31 +82,31 @@ void EVENT_USB_Device_ControlRequest(void)
       going to the standard HID driver. See GET_DESCRIPTOR and GET_CAPABILITIES
       on http://xboxdevwiki.net/Xbox_Input_Devices. */
 
-   if (USB_ControlRequest.bmRequestType == 0xC1 && 
-       USB_ControlRequest.bRequest == 0x06 && 
+   if (USB_ControlRequest.bmRequestType == 0xC1 &&
+       USB_ControlRequest.bRequest == 0x06 &&
        USB_ControlRequest.wValue == 0x4200) {
       Endpoint_ClearSETUP();
-      Endpoint_Write_Control_PStream_LE(&DUKE_XID_DESCRIPTOR, 
+      Endpoint_Write_Control_PStream_LE(&DUKE_XID_DESCRIPTOR,
                                         sizeof(DUKE_XID_DESCRIPTOR));
       Endpoint_ClearOUT();
       return;
    }
 
-   if (USB_ControlRequest.bmRequestType == 0xC1 && 
-       USB_ControlRequest.bRequest == 0x01 && 
+   if (USB_ControlRequest.bmRequestType == 0xC1 &&
+       USB_ControlRequest.bRequest == 0x01 &&
        USB_ControlRequest.wValue == 0x0100) {
       Endpoint_ClearSETUP();
-      Endpoint_Write_Control_PStream_LE(&DUKE_XID_CAPABILITIES_IN, 
+      Endpoint_Write_Control_PStream_LE(&DUKE_XID_CAPABILITIES_IN,
                                         sizeof(DUKE_XID_CAPABILITIES_IN));
       Endpoint_ClearOUT();
       return;
    }
 
-   if (USB_ControlRequest.bmRequestType == 0xC1 && 
-       USB_ControlRequest.bRequest == 0x01 && 
+   if (USB_ControlRequest.bmRequestType == 0xC1 &&
+       USB_ControlRequest.bRequest == 0x01 &&
        USB_ControlRequest.wValue == 0x0200) {
       Endpoint_ClearSETUP();
-      Endpoint_Write_Control_PStream_LE(&DUKE_XID_CAPABILITIES_OUT, 
+      Endpoint_Write_Control_PStream_LE(&DUKE_XID_CAPABILITIES_OUT,
                                         sizeof(DUKE_XID_CAPABILITIES_OUT));
       Endpoint_ClearOUT();
       return;
@@ -129,12 +116,10 @@ void EVENT_USB_Device_ControlRequest(void)
    HID_Device_ProcessControlRequest(&XboxDuke_HID_Interface);
 }
 
-
 void EVENT_USB_Device_StartOfFrame(void)
 {
    HID_Device_MillisecondElapsed(&XboxDuke_HID_Interface);
 }
-
 
 bool CALLBACK_HID_Device_CreateHIDReport(USB_ClassInfo_HID_Device_t *const HIDInterfaceInfo,
                                          uint8_t *const ReportID,
@@ -144,28 +129,27 @@ bool CALLBACK_HID_Device_CreateHIDReport(USB_ClassInfo_HID_Device_t *const HIDIn
 {
    USB_XboxDuke_Data_t *Data = (USB_XboxDuke_Data_t *)ReportData;
 
-   Data->startByte         = 0x00;
-   Data->byteLength        = sizeof(USB_XboxDuke_Data_t);
-   Data->DigitalButtons    = XboxDuke.DigitalButtons;
-   Data->reserved          = 0x00;
-   Data->A                 = XboxDuke.A;
-   Data->B                 = XboxDuke.B;
-   Data->X                 = XboxDuke.X;
-   Data->Y                 = XboxDuke.Y;
-   Data->Black             = XboxDuke.Black;
-   Data->White             = XboxDuke.White;
-   Data->LeftTrigger       = XboxDuke.LeftTrigger;
-   Data->RightTrigger      = XboxDuke.RightTrigger;
-   Data->LeftHatX          = XboxDuke.LeftHatX;
-   Data->LeftHatY          = XboxDuke.LeftHatY;
-   Data->RightHatX         = XboxDuke.RightHatX;
-   Data->RightHatY         = XboxDuke.RightHatY;
+   Data->startByte      = 0x00;
+   Data->byteLength     = sizeof(USB_XboxDuke_Data_t);
+   Data->DigitalButtons = XboxDuke.DigitalButtons;
+   Data->reserved       = 0x00;
+   Data->A              = XboxDuke.A;
+   Data->B              = XboxDuke.B;
+   Data->X              = XboxDuke.X;
+   Data->Y              = XboxDuke.Y;
+   Data->Black          = XboxDuke.Black;
+   Data->White          = XboxDuke.White;
+   Data->LeftTrigger    = XboxDuke.LeftTrigger;
+   Data->RightTrigger   = XboxDuke.RightTrigger;
+   Data->LeftHatX       = XboxDuke.LeftHatX;
+   Data->LeftHatY       = XboxDuke.LeftHatY;
+   Data->RightHatX      = XboxDuke.RightHatX;
+   Data->RightHatY      = XboxDuke.RightHatY;
 
    *ReportSize = sizeof(USB_XboxDuke_Data_t);
 
    return false;
 }
-
 
 void CALLBACK_HID_Device_ProcessHIDReport(USB_ClassInfo_HID_Device_t *const HIDInterfaceInfo,
                                           uint8_t const ReportID,
@@ -176,16 +160,15 @@ void CALLBACK_HID_Device_ProcessHIDReport(USB_ClassInfo_HID_Device_t *const HIDI
    /* Only expect one HID report from the host and this is the rumble levels 
       which is 6 bytes long. See http://euc.jp/periphs/xbox-controller.en.html. */
    if (ReportSize == 0x06) {
-      XboxDuke.LeftRumble     = ((uint8_t *)ReportData)[3];
-      XboxDuke.RightRumble    = ((uint8_t *)ReportData)[5];
-      XboxDuke.UpdateRumble   = true;
+      XboxDuke.LeftRumble   = ((uint8_t *)ReportData)[3];
+      XboxDuke.RightRumble  = ((uint8_t *)ReportData)[5];
+      XboxDuke.UpdateRumble = true;
    }
 }
 
-
-uint16_t CALLBACK_USB_GetDescriptor(uint16_t const wValue, 
+uint16_t CALLBACK_USB_GetDescriptor(uint16_t const wValue,
                                     uint16_t const wIndex,
-                                    void const **const DescriptorAddress) 
+                                    void const **const DescriptorAddress)
 {
    uint8_t const DescriptorType = wValue >> 8;
 
@@ -204,7 +187,6 @@ uint16_t CALLBACK_USB_GetDescriptor(uint16_t const wValue,
    }
 }
 
-
 void XboxDuke_Init(void)
 {
    /* Setup hardware for LUFA. */
@@ -220,26 +202,23 @@ void XboxDuke_Init(void)
    XboxDuke.XboxDukeConnected = true;
 }
 
-
-void XboxDuke_Attach(void) 
+void XboxDuke_Attach(void)
 {
    USB_Attach();
    XboxDuke.XboxDukeConnected = true;
 }
 
-
-void XboxDuke_Detach(void) 
+void XboxDuke_Detach(void)
 {
    USB_Detach();
    XboxDuke.XboxDukeConnected = false;
 }
 
-
 void XboxDuke_USBTask(void)
 {
-   HID_Device_USBTask(&XboxDuke_HID_Interface); 
+   HID_Device_USBTask(&XboxDuke_HID_Interface);
    USB_USBTask();
-   
+
    /* THPS 2X, Outrun 2 Coast-to-Coast and probably others send rumble commands 
       to the USB OUT pipe instead of the control pipe. So unfortunately need to 
       manually read the out pipe and update the rumble values. */
@@ -252,20 +231,20 @@ void XboxDuke_USBTask(void)
       Endpoint_ClearOUT();
 
       if (ReportData[1] == 0x06) {
-         XboxDuke.LeftRumble     = ReportData[3];
-         XboxDuke.RightRumble    = ReportData[5];
-         XboxDuke.UpdateRumble   = true;
+         XboxDuke.LeftRumble   = ReportData[3];
+         XboxDuke.RightRumble  = ReportData[5];
+         XboxDuke.UpdateRumble = true;
       }
    }
 
    Endpoint_SelectEndpoint(ep);
 
    /* Turn off rumble on an in-game-reset button combo. */
-   // if (XboxDuke.DigitalButtons & D_START && 
-   //     XboxDuke.DigitalButtons & D_BACK && 
+   // if (XboxDuke.DigitalButtons & D_START &&
+   //     XboxDuke.DigitalButtons & D_BACK &&
    //     XboxDuke.LeftTrigger > 0x00 &&
    //     XboxDuke.RightTrigger > 0x00) {
-   //    XboxDuke.LeftRumble     = 0x00; 
+   //    XboxDuke.LeftRumble     = 0x00;
    //    XboxDuke.RightRumble    = 0x00;
    //    XboxDuke.UpdateRumble   = true;
    // }
