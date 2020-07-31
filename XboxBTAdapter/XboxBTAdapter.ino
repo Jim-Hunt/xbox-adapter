@@ -1,6 +1,5 @@
 #include "XboxDuke.h"
 #include "XBOXONEBT.h"
-#include <SPI.h>
 
 #define LED_BLINK_FAST 500
 #define LED_BLINK_SLOW 4000
@@ -55,13 +54,13 @@ void loop()
       XboxDuke.RightHatY      = XboxOneBT.getAnalogHat(RightHatY);
 
       /* Rumble values TO the gamepad. */
-      // if (XboxDuke.UpdateRumble) {
-      //    if (XboxDuke.LeftRumble == 0x00 && XboxDuke.RightRumble == 0x00)
-      //       XboxOneBT.setRumbleOff();
-      //    else
-      //       XboxOneBT.setRumbleOn(0x00, 0x00, XboxDuke.LeftRumble, XboxDuke.RightRumble);
-      //    XboxDuke.UpdateRumble = false;
-      // }
+      if (XboxDuke.UpdateRumble) {
+         if (XboxDuke.LeftRumble == 0x00 && XboxDuke.RightRumble == 0x00)
+            XboxOneBT.setRumbleOff();
+         else
+            XboxOneBT.setRumbleOn(0x00, 0x00, XboxDuke.LeftRumble, XboxDuke.RightRumble);
+         XboxDuke.UpdateRumble = false;
+      }
 
       gamepadConnected = true;
    }
