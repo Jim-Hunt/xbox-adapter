@@ -15,7 +15,7 @@
 
 class XBOXONEBT : public BluetoothService
 {
- public:
+public:
    XBOXONEBT(XBOXONEBTSSP *p, bool pair = false);
    void disconnect();
    void pair(void);
@@ -29,13 +29,13 @@ class XBOXONEBT : public BluetoothService
    bool connected;
    bool XboxOneBTConnected;
 
- protected:
+protected:
    void ACLData(uint8_t *ACLData);
    void Run();
    void Reset();
    void onInit();
 
- private:
+private:
    void setProtocol();
    void L2CAP_task();
    uint8_t interrupt_dcid[2];
@@ -52,8 +52,7 @@ class XBOXONEBT : public BluetoothService
       uint16_t RightHatY;
       uint16_t LeftTrigger;
       uint16_t RightTrigger;
-      uint8_t DigitalPad;
-      uint16_t DigitalButtons;
+      uint32_t DigitalButtons;
    };
    XboxOneBT_Data_t *Data;
    uint16_t ButtonState;

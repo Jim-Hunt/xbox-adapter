@@ -161,31 +161,32 @@ void XBOXONEBT::ACLData(uint8_t *l2capinbuf)
       if (l2capinbuf[6] | (l2capinbuf[7] << 8) == L2CAP_INTERRUPT_DCID &&
           l2capinbuf[8] == HID_DATA_REQUEST_IN) {
 
-         // // Serial1.println(l2capinbuf[0], HEX); /* 0x26 HCI handle with PB,BC flag LSB */
-         // // Serial1.println(l2capinbuf[1], HEX); /* 0x20 HCI handle with PB,BC flag */
-         // // Serial1.println(l2capinbuf[2], HEX); /* gamepad controls=0x15 (21), xbox button=0x07 (7) total length LSB */
-         // // Serial1.println(l2capinbuf[3], HEX); /* 0x00 total length */
-         // // Serial1.println(l2capinbuf[4], HEX); /* gamepad controls=0x11 (17), xbox button=0x03 (3) data length */
-         // // Serial1.println(l2capinbuf[5], HEX); /* 0x00 data length */
-         // // Serial1.println(l2capinbuf[6], HEX); /* 0x71 interrupt destination channel identifier (DCID) LSB */
-         // // Serial1.println(l2capinbuf[7], HEX); /* 0x00 interrupt destination channel identifier (DCID) */
-         // // Serial1.println(l2capinbuf[8], HEX); /* 0xA1 ? HID BT DATA_request (0xA0) | Report Type (Input 0x01) ? */
-         // // Serial1.println(l2capinbuf[9], HEX); /* 0x01=gamepad controls, 0x02=xbox button */
-         // // Serial1.println(l2capinbuf[10], BIN); /* LHAT X LSB, XBOX=00000001 */
-         // // Serial1.println(l2capinbuf[11], BIN); /* LHAT X */
-         // // Serial1.println(l2capinbuf[12], BIN); /* LHAT Y LSB */
-         // // Serial1.println(l2capinbuf[13], BIN); /* LHAT Y */
-         // // Serial1.println(l2capinbuf[14], BIN); /* RHAT X LSB */
-         // // Serial1.println(l2capinbuf[15], BIN); /* RHAT X */
-         // // Serial1.println(l2capinbuf[16], BIN); /* RHAT Y LSB */
-         // // Serial1.println(l2capinbuf[17], BIN); /* RHAT Y */
-         // // Serial1.println(l2capinbuf[18], BIN); /* LT MSB */
-         // // Serial1.println(l2capinbuf[19], BIN); /* LT */
-         // // Serial1.println(l2capinbuf[20], BIN); /* RT MSB */
-         // // Serial1.println(l2capinbuf[21], BIN); /* RT */
-         // // Serial1.println(l2capinbuf[22], BIN); /* UP=1, RIGHT=11, DOWN=101, LEFT=111 */
-         // // Serial1.println(l2capinbuf[23], BIN); /* A=1, B=10, X=100, Y=1000, LS=10000, RS=100000, BACK=1000000, START=10000000 */
-         // // Serial1.println(l2capinbuf[24], BIN); /* LHAT=1, RHAT=10 */
+         // // Serial.println(l2capinbuf[0], HEX); /* 0x26 HCI handle with PB,BC flag LSB */
+         // // Serial.println(l2capinbuf[1], HEX); /* 0x20 HCI handle with PB,BC flag */
+         // // Serial.println(l2capinbuf[2], HEX); /* gamepad controls=0x16 (22) LSB */
+         // // Serial.println(l2capinbuf[3], HEX); /* 0x00 total length */
+         // // Serial.println(l2capinbuf[4], HEX); /* gamepad controls=0x12 (18) data length */
+         // // Serial.println(l2capinbuf[5], HEX); /* 0x00 data length */
+         // // Serial.println(l2capinbuf[6], HEX); /* 0x71 interrupt destination channel identifier (DCID) LSB */
+         // // Serial.println(l2capinbuf[7], HEX); /* 0x00 interrupt destination channel identifier (DCID) */
+         // // Serial.println(l2capinbuf[8], HEX); /* 0xA1 ? HID BT DATA_request (0xA0) | Report Type (Input 0x01) ? */
+         // // Serial.println(l2capinbuf[9], HEX); /* 0x01=gamepad controls */
+         // // Serial.println(l2capinbuf[10], BIN); /* LHAT X LSB */
+         // // Serial.println(l2capinbuf[11], BIN); /* LHAT X */
+         // // Serial.println(l2capinbuf[12], BIN); /* LHAT Y LSB */
+         // // Serial.println(l2capinbuf[13], BIN); /* LHAT Y */
+         // // Serial.println(l2capinbuf[14], BIN); /* RHAT X LSB */
+         // // Serial.println(l2capinbuf[15], BIN); /* RHAT X */
+         // // Serial.println(l2capinbuf[16], BIN); /* RHAT Y LSB */
+         // // Serial.println(l2capinbuf[17], BIN); /* RHAT Y */
+         // // Serial.println(l2capinbuf[18], BIN); /* LT MSB */
+         // // Serial.println(l2capinbuf[19], BIN); /* LT */
+         // // Serial.println(l2capinbuf[20], BIN); /* RT MSB */
+         // // Serial.println(l2capinbuf[21], BIN); /* RT */
+         // Serial.println(l2capinbuf[22], BIN); /* UP=1, RIGHT=11, DOWN=101, LEFT=111 */
+         // Serial.println(l2capinbuf[23], BIN); /* A=1, B=10, X=1000, Y=10000, LS=1000000, RS=10000000*/
+         // Serial.println(l2capinbuf[24], BIN); /* START=1000, XBOX=10000, LHAT=100000, RHAT=1000000 */
+         // Serial.println(l2capinbuf[25], BIN); /* BACK=1 */
 
          Data = (XboxOneBT_Data_t *)&l2capinbuf[10];
       }
@@ -404,47 +405,58 @@ uint16_t XBOXONEBT::getButtonPress(ButtonEnum b)
       case R2:
          return Data->RightTrigger;
 
+      /* UP=1, RIGHT=11, DOWN=101, LEFT=111 */
+
       case UP:
-         return (Data->DigitalPad == 0b00000001);
+         return (lowByte(Data->DigitalButtons) == 0b00000001);
 
       case RIGHT:
-         return (Data->DigitalPad == 0b00000011);
+         return (lowByte(Data->DigitalButtons) == 0b00000011);
 
       case DOWN:
-         return (Data->DigitalPad == 0b00000101);
+         return (lowByte(Data->DigitalButtons) == 0b00000101);
 
       case LEFT:
-         return (Data->DigitalPad == 0b00000111);
+         return (lowByte(Data->DigitalButtons) == 0b00000111);
+
+      /* A=1, B=10, X=1000, Y=10000, LS=1000000, RS=10000000 */
 
       case A:
-         return (bool)(Data->DigitalButtons & 0b00000001);
+         return (bool)(Data->DigitalButtons & (uint32_t)0b00000001 << 8);
 
       case B:
-         return (bool)(Data->DigitalButtons & 0b00000010);
+         return (bool)(Data->DigitalButtons & (uint32_t)0b00000010 << 8);
 
       case X:
-         return (bool)(Data->DigitalButtons & 0b00000100);
+         return (bool)(Data->DigitalButtons & (uint32_t)0b00001000 << 8);
 
       case Y:
-         return (bool)(Data->DigitalButtons & 0b00001000);
+         return (bool)(Data->DigitalButtons & (uint32_t)0b00010000 << 8);
 
       case L1:
-         return (bool)(Data->DigitalButtons & 0b00010000);
+         return (bool)(Data->DigitalButtons & (uint32_t)0b01000000 << 8);
 
       case R1:
-         return (bool)(Data->DigitalButtons & 0b00100000);
+         return (bool)(Data->DigitalButtons & (uint32_t)0b10000000 << 8);
 
-      case BACK:
-         return (bool)(Data->DigitalButtons & 0b01000000);
+      /* START=1000, XBOX=10000, LHAT=100000, RHAT=1000000 */
 
       case START:
-         return (bool)(Data->DigitalButtons & 0b10000000);
+         return (bool)(Data->DigitalButtons & (uint32_t)0b00001000 << 16);
+
+      case XBOX:
+         return (bool)(Data->DigitalButtons & (uint32_t)0b00010000 << 16);
 
       case L3:
-         return (bool)(Data->DigitalButtons & 0b100000000);
+         return (bool)(Data->DigitalButtons & (uint32_t)0b00100000 << 16);
 
       case R3:
-         return (bool)(Data->DigitalButtons & 0b1000000000);
+         return (bool)(Data->DigitalButtons & (uint32_t)0b01000000 << 16);
+
+      /* BACK=1 */
+
+      case BACK:
+         return (bool)(Data->DigitalButtons & ((uint32_t)0b00000001 << 24));
    }
 }
 
