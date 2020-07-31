@@ -172,7 +172,7 @@ class BluetoothService;
 
 class XBOXONEBTSSP : public USBDeviceConfig, public UsbConfigXtracter
 {
- public:
+public:
    XBOXONEBTSSP(USB *p);
 
    uint8_t ConfigureDevice(uint8_t parent, uint8_t port, bool lowspeed);
@@ -264,7 +264,7 @@ class XBOXONEBTSSP : public USBDeviceConfig, public UsbConfigXtracter
    bool pairWithHIDDevice;
    bool pairedDevice;
 
- protected:
+protected:
    void PrintEndpointDescriptor(const USB_ENDPOINT_DESCRIPTOR *ep_ptr);
    USB *pUsb;
    uint8_t bAddress;
@@ -277,7 +277,7 @@ class XBOXONEBTSSP : public USBDeviceConfig, public UsbConfigXtracter
    static const uint8_t BTDSSP_DATAIN_PIPE;
    static const uint8_t BTDSSP_DATAOUT_PIPE;
 
- private:
+private:
    void Initialize();
    void HCI_event_task();
    void HCI_task();
@@ -302,7 +302,7 @@ class XBOXONEBTSSP : public USBDeviceConfig, public UsbConfigXtracter
 
 class BluetoothService
 {
- public:
+public:
    BluetoothService(XBOXONEBTSSP *p) : pBtdssp(p)
    {
       if (pBtdssp)
@@ -317,7 +317,7 @@ class BluetoothService
    virtual void Reset()                   = 0;
    virtual void disconnect()              = 0;
 
- protected:
+protected:
    bool checkHciHandle(uint8_t *buf, uint16_t handle)
    {
       return (buf[0] == (handle & 0xFF)) && (buf[1] == ((handle >> 8) | 0x20));

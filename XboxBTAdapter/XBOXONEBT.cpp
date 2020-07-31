@@ -406,7 +406,6 @@ uint16_t XBOXONEBT::getButtonPress(ButtonEnum b)
          return Data->RightTrigger;
 
       /* UP=1, RIGHT=11, DOWN=101, LEFT=111 */
-
       case UP:
          return (lowByte(Data->DigitalButtons) == 0b00000001);
 
@@ -420,7 +419,6 @@ uint16_t XBOXONEBT::getButtonPress(ButtonEnum b)
          return (lowByte(Data->DigitalButtons) == 0b00000111);
 
       /* A=1, B=10, X=1000, Y=10000, LS=1000000, RS=10000000 */
-
       case A:
          return (bool)(Data->DigitalButtons & (uint32_t)0b00000001 << 8);
 
@@ -440,7 +438,6 @@ uint16_t XBOXONEBT::getButtonPress(ButtonEnum b)
          return (bool)(Data->DigitalButtons & (uint32_t)0b10000000 << 8);
 
       /* START=1000, XBOX=10000, LHAT=100000, RHAT=1000000 */
-
       case START:
          return (bool)(Data->DigitalButtons & (uint32_t)0b00001000 << 16);
 
@@ -453,7 +450,7 @@ uint16_t XBOXONEBT::getButtonPress(ButtonEnum b)
       case R3:
          return (bool)(Data->DigitalButtons & (uint32_t)0b01000000 << 16);
 
-      /* BACK=1 */
+         /* BACK=1 */
 
       case BACK:
          return (bool)(Data->DigitalButtons & ((uint32_t)0b00000001 << 24));

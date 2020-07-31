@@ -3,6 +3,7 @@ UseTab: Never
 IndentWidth: 3
 TabWidth: 3
 ContinuationIndentWidth: 3
+AccessModifierOffset: -3
 ColumnLimit: 0
 BreakBeforeBraces: Linux
 IndentCaseLabels: true
