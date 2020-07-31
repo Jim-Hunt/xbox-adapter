@@ -386,12 +386,12 @@ void XBOXONEBTSSP::HCI_event_task()
                   for (uint8_t j = 0; j < 3; j++)
                      classOfDevice[j] = hcibuf[j + 4 + offset];
 
-                     Serial1.print(F("Class of device: "));
-                     Serial1.print(classOfDevice[2], HEX);
-                     Serial1.print(F(" "));
-                     Serial1.print(classOfDevice[1], HEX);
-                     Serial1.print(F(" "));
-                     Serial1.println(classOfDevice[0], HEX);
+                  Serial1.print(F("Class of device: "));
+                  Serial1.print(classOfDevice[2], HEX);
+                  Serial1.print(F(" "));
+                  Serial1.print(classOfDevice[1], HEX);
+                  Serial1.print(F(" "));
+                  Serial1.println(classOfDevice[0], HEX);
 
                   /* Check if it is a mouse, keyboard, gamepad or joystick - 
                      see: http://bluetooth-pentest.narod.ru/software/bluetooth_class_of_device-service_generator.html */
@@ -402,7 +402,7 @@ void XBOXONEBTSSP::HCI_event_task()
                      if (classOfDevice[0] & 0x80) {
                         Serial1.println(F("Mouse found."));
                      }
-                     if (classOfDevice[0] & 0x40){
+                     if (classOfDevice[0] & 0x40) {
                         Serial1.println(F("Keyboard found."));
                      }
                      if (classOfDevice[0] & 0x04) {
@@ -475,13 +475,13 @@ void XBOXONEBTSSP::HCI_event_task()
 
             for (uint8_t i = 0; i < 3; i++)
                classOfDevice[i] = hcibuf[i + 8];
-               Serial1.println(F("EV_CONNECTION_REQUEST"));
-               Serial1.print(F("Class of device: "));
-               Serial1.print(classOfDevice[2], HEX);
-               Serial1.print(F(" "));
-               Serial1.print(classOfDevice[1], HEX);
-               Serial1.print(F(" "));
-               Serial1.println(classOfDevice[0], HEX);
+            Serial1.println(F("EV_CONNECTION_REQUEST"));
+            Serial1.print(F("Class of device: "));
+            Serial1.print(classOfDevice[2], HEX);
+            Serial1.print(F(" "));
+            Serial1.print(classOfDevice[1], HEX);
+            Serial1.print(F(" "));
+            Serial1.println(classOfDevice[0], HEX);
 
             /* Check if it is a mouse, keyboard, gamepad or joystick */
             if ((classOfDevice[1] & 0x05) && (classOfDevice[0] & 0xCC)) {
@@ -617,7 +617,6 @@ void XBOXONEBTSSP::HCI_event_task()
       Serial1.print(F("HCI event error:"));
       Serial1.println(rcode, HEX);
    }
-
 }
 
 /* Poll Bluetooth and print result */
@@ -847,7 +846,7 @@ void XBOXONEBTSSP::HCI_task()
          memset(hcibuf, 0, BULK_MAXPKTSIZE);
          memset(l2capinbuf, 0, BULK_MAXPKTSIZE);
          connectToHIDDevice = incomingHIDDevice = pairWithHIDDevice = false;
-         hci_state = HCI_SCANNING_STATE;
+         hci_state                                                  = HCI_SCANNING_STATE;
          break;
    }
 }

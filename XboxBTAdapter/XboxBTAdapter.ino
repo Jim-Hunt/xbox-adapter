@@ -27,7 +27,7 @@ void loop()
 
    bool gamepadConnected = false;
 
-   if (XboxOneBT.connected) {
+   if (XboxOneBT.XboxOneBTConnected) {
       /* Button, trigger and hat values FROM the gamepad. */
       uint8_t digitalButtons = 0b00000000;
 

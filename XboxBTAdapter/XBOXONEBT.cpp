@@ -1,9 +1,8 @@
 #include "XBOXONEBT.h"
 
-XBOXONEBT::XBOXONEBT(XBOXONEBTSSP *p, bool pair) : BluetoothService(p), Data(0)
+XBOXONEBT::XBOXONEBT(XBOXONEBTSSP *p, bool pair) : BluetoothService(p), Data(0x00)
 {
    pBtdssp->pairWithHIDDevice = pair;
-   // memset(Data, 0x00, sizeof(Data));
    Reset();
 }
 
@@ -18,6 +17,8 @@ void XBOXONEBT::Reset()
    control_dcid[1]   = L2CAP_CONTROL_DCID >> 8;
    interrupt_dcid[0] = L2CAP_INTERRUPT_DCID;
    interrupt_dcid[1] = L2CAP_INTERRUPT_DCID >> 8;
+
+   XboxOneBTConnected = false;
 }
 
 void XBOXONEBT::disconnect()
@@ -385,15 +386,18 @@ void XBOXONEBT::onInit()
    buf[8] = 0x00; /* Delay */
    buf[9] = 0x01; /* Loop */
 
-   pBtdssp->L2CAP_Command(hci_handle, 
-                          buf, 
-                          sizeof(buf), 
-                          interrupt_scid[0], 
+   pBtdssp->L2CAP_Command(hci_handle,
+                          buf,
+                          sizeof(buf),
+                          interrupt_scid[0],
                           interrupt_scid[1]);
+
+   XboxOneBTConnected = true;
 };
 
-uint16_t XBOXONEBT::getButtonPress(ButtonEnum b) {
-   switch(b) {
+uint16_t XBOXONEBT::getButtonPress(ButtonEnum b)
+{
+   switch (b) {
       case L2:
          return Data->LeftTrigger;
 
@@ -435,7 +439,7 @@ uint16_t XBOXONEBT::getButtonPress(ButtonEnum b) {
 
       case START:
          return (bool)(Data->DigitalButtons & 0b10000000);
-      
+
       case L3:
          return (bool)(Data->DigitalButtons & 0b100000000);
 
@@ -444,7 +448,8 @@ uint16_t XBOXONEBT::getButtonPress(ButtonEnum b) {
    }
 }
 
-int16_t XBOXONEBT::getAnalogHat(AnalogHatEnum a) {
+int16_t XBOXONEBT::getAnalogHat(AnalogHatEnum a)
+{
    switch (a) {
       case LeftHatX:
          return (int16_t)(Data->LeftHatX + INT16_MIN);
@@ -456,11 +461,11 @@ int16_t XBOXONEBT::getAnalogHat(AnalogHatEnum a) {
          return (int16_t)(Data->RightHatX + INT16_MIN);
 
       case RightHatY:
-         return (int16_t)(INT16_MAX - Data->RightHatY); 
+         return (int16_t)(INT16_MAX - Data->RightHatY);
    }
 }
 
-void XBOXONEBT::setRumbleOff() 
+void XBOXONEBT::setRumbleOff()
 {
    uint8_t buf[10];
 
@@ -475,34 +480,34 @@ void XBOXONEBT::setRumbleOff()
    buf[8] = 0x00; /* Delay */
    buf[9] = 0x00; /* Repeat */
 
-   pBtdssp->L2CAP_Command(hci_handle, 
-                          buf, 
-                          sizeof(buf), 
-                          interrupt_scid[0], 
+   pBtdssp->L2CAP_Command(hci_handle,
+                          buf,
+                          sizeof(buf),
+                          interrupt_scid[0],
                           interrupt_scid[1]);
 }
 
-void XBOXONEBT::setRumbleOn(uint8_t leftTrigger, 
-                            uint8_t rightTrigger, 
-                            uint8_t leftMotor, 
-                            uint8_t rightMotor) 
+void XBOXONEBT::setRumbleOn(uint8_t leftTrigger,
+                            uint8_t rightTrigger,
+                            uint8_t leftMotor,
+                            uint8_t rightMotor)
 {
    uint8_t buf[10];
 
-   buf[0] = 0xA2; /* HID BT DATA_request (0xA0) | Report Type (Output 0x02) */
-   buf[1] = 0x03; /* Report id */
-   buf[2] = 0x0F; /* Rumble mask (0000 lT rT L R) */
-   buf[3] = leftTrigger; /* L trigger force */
+   buf[0] = 0xA2;         /* HID BT DATA_request (0xA0) | Report Type (Output 0x02) */
+   buf[1] = 0x03;         /* Report id */
+   buf[2] = 0x0F;         /* Rumble mask (0000 lT rT L R) */
+   buf[3] = leftTrigger;  /* L trigger force */
    buf[4] = rightTrigger; /* R trigger force */
-   buf[5] = leftMotor; /* L actuator force */
-   buf[6] = rightMotor; /* R actuator force */
-   buf[7] = 0xFF; /* Duration */
-   buf[8] = 0x00; /* Delay */
-   buf[9] = 0xFF; /* Repeat */
+   buf[5] = leftMotor;    /* L actuator force */
+   buf[6] = rightMotor;   /* R actuator force */
+   buf[7] = 0xFF;         /* Duration */
+   buf[8] = 0x00;         /* Delay */
+   buf[9] = 0xFF;         /* Repeat */
 
-   pBtdssp->L2CAP_Command(hci_handle, 
-                          buf, 
-                          sizeof(buf), 
-                          interrupt_scid[0], 
+   pBtdssp->L2CAP_Command(hci_handle,
+                          buf,
+                          sizeof(buf),
+                          interrupt_scid[0],
                           interrupt_scid[1]);
 }
