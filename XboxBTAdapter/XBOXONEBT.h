@@ -6,12 +6,11 @@
 
 #define USB_HID_BOOT_PROTOCOL 0x00
 #define HID_RPT_PROTOCOL      0x01
-
-#define L2CAP_STANDARD_CID   0x0001
-#define L2CAP_CONTROL_DCID   0x0070
-#define L2CAP_INTERRUPT_DCID 0x0071
-#define HID_DATA_REQUEST_IN  0xA1
-#define HID_DATA_REQUEST_OUT 0xA2
+#define L2CAP_STANDARD_CID    0x0001
+#define L2CAP_CONTROL_DCID    0x0070
+#define L2CAP_INTERRUPT_DCID  0x0071
+#define HID_DATA_REQUEST_IN   0xA1
+#define HID_DATA_REQUEST_OUT  0xA2
 
 class XBOXONEBT : public BluetoothService
 {
@@ -26,7 +25,6 @@ public:
                     uint8_t leftMotor,
                     uint8_t rightMotor);
    void setRumbleOff();
-   bool connected;
    bool XboxOneBTConnected;
 
 protected:
@@ -44,6 +42,7 @@ private:
    uint8_t control_scid[2];
    uint8_t l2cap_state;
    bool activeConnection;
+   bool connected;
 
    struct XboxOneBT_Data_t {
       uint16_t LeftHatX;
@@ -55,9 +54,6 @@ private:
       uint32_t DigitalButtons;
    };
    XboxOneBT_Data_t *Data;
-   uint16_t ButtonState;
-   int16_t hatValue[4];
-   uint16_t triggerValue[2];
 };
 
 #endif
