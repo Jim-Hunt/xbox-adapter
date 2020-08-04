@@ -1,8 +1,9 @@
 #include "XboxDuke.h"
 #include "XBOXONEBT.h"
 
-#define LED_BLINK_FAST 500
-#define LED_BLINK_SLOW 4000
+#define LED_BLINK_CONNECTED 5000
+#define LED_BLINK_WAITING 1000
+#define LED_BLINK_PAIRING 200
 
 USB UsbHost;
 XBOXONEBTSSP XboxOneBTSSP(&UsbHost);
@@ -78,7 +79,13 @@ void blink()
    uint32_t static timer = 0;
 
    if (millis() > timer) {
-      timer += (XboxDuke.XboxDukeConnected) ? LED_BLINK_SLOW : LED_BLINK_FAST;
+      if (XboxOneBT.XboxOneBTConnected)
+         timer = millis() + LED_BLINK_CONNECTED;
+      else if (XboxOneBTSSP.pairWithHIDDevice)
+         timer = millis() + LED_BLINK_PAIRING;
+      else
+         timer = millis() + LED_BLINK_WAITING;
+
       digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
    }
 }

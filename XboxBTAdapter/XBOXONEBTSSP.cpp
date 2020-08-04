@@ -474,7 +474,7 @@ void XBOXONEBTSSP::HCI_event_task()
             // Serial1.println(classOfDevice[0], HEX);
 
             /* Check if it is a mouse, keyboard, gamepad or joystick */
-            if ((classOfDevice[1] & 0x05) && 
+            if ((classOfDevice[1] & 0x05) &&
                 (classOfDevice[0] & 0xCC)) {
                if (classOfDevice[0] & 0x80) {
                   // Serial1.println(F("Mouse is connecting."));
@@ -1355,7 +1355,6 @@ void XBOXONEBTSSP::l2cap_information_response(uint16_t handle,
    L2CAP_Command(handle, l2capoutbuf, 12);
 }
 
-
 int8_t XBOXONEBTSSP::registerBluetoothService(BluetoothService *pService)
 {
    for (uint8_t i = 0; i < BTDSSP_NUM_SERVICES; i++) {
@@ -1378,14 +1377,17 @@ uint8_t XBOXONEBTSSP::readPollInterval()
 {
    return pollInterval;
 };
+
 uint8_t XBOXONEBTSSP::GetAddress()
 {
    return bAddress;
 };
+
 bool XBOXONEBTSSP::isReady()
 {
    return bPollEnable;
 };
+
 bool XBOXONEBTSSP::DEVCLASSOK(uint8_t klass)
 {
    return (klass == USB_CLASS_WIRELESS_CTRL);
