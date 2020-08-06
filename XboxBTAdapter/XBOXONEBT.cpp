@@ -72,14 +72,14 @@ void XBOXONEBT::ACLData(uint8_t *l2capinbuf)
                if (l2capinbuf[16] | (l2capinbuf[17] << 8) == 0x0000 &&
                    l2capinbuf[18] | (l2capinbuf[19] << 8) == SUCCESSFUL) {
                   if (l2capinbuf[14] | (l2capinbuf[15] << 8) == L2CAP_CONTROL_DCID) {
-                     // Serial1.println(F("HID control connection complete"));
+                     // Serial1.println(F("HID control connection complete."));
                      identifier      = l2capinbuf[9];
                      control_scid[0] = l2capinbuf[12];
                      control_scid[1] = l2capinbuf[13];
                      l2cap_set_flag(L2CAP_FLAG_CONTROL_CONNECTED);
                   }
                   if (l2capinbuf[14] | (l2capinbuf[15] << 8) == L2CAP_INTERRUPT_DCID) {
-                     // Serial1.println(F("HID interrupt connection complete"));
+                     // Serial1.println(F("HID interrupt connection complete."));
                      identifier        = l2capinbuf[9];
                      interrupt_scid[0] = l2capinbuf[12];
                      interrupt_scid[1] = l2capinbuf[13];
@@ -90,13 +90,13 @@ void XBOXONEBT::ACLData(uint8_t *l2capinbuf)
 
             case L2CAP_CMD_CONFIG_REQUEST:
                if (l2capinbuf[12] | (l2capinbuf[13] << 8) == L2CAP_CONTROL_DCID) {
-                  // Serial1.println(F("L2CAP_CMD_CONFIG_REQUEST:L2CAP_CONTROL_DCID"));
+                  // // Serial1.println(F("L2CAP_CMD_CONFIG_REQUEST:L2CAP_CONTROL_DCID"));
                   pBtdssp->l2cap_config_response(hci_handle,
                                                  l2capinbuf[9],
                                                  control_scid);
                }
                if (l2capinbuf[12] | (l2capinbuf[13] << 8) == L2CAP_INTERRUPT_DCID) {
-                  // Serial1.println(F("L2CAP_CMD_CONFIG_REQUEST:L2CAP_INTERRUPT_DCID"));
+                  // // Serial1.println(F("L2CAP_CMD_CONFIG_REQUEST:L2CAP_INTERRUPT_DCID"));
                   pBtdssp->l2cap_config_response(hci_handle,
                                                  l2capinbuf[9],
                                                  interrupt_scid);
@@ -106,12 +106,12 @@ void XBOXONEBT::ACLData(uint8_t *l2capinbuf)
             case L2CAP_CMD_CONFIG_RESPONSE:
                if (l2capinbuf[16] | (l2capinbuf[17] << 8) == 0x0000) {
                   if (l2capinbuf[12] | (l2capinbuf[13] << 8) == L2CAP_CONTROL_DCID) {
-                     // Serial1.println(F("L2CAP_CMD_CONFIG_RESPONSE:L2CAP_CONTROL_DCID"));
+                     // // Serial1.println(F("L2CAP_CMD_CONFIG_RESPONSE:L2CAP_CONTROL_DCID"));
                      identifier = l2capinbuf[9];
                      l2cap_set_flag(L2CAP_FLAG_CONFIG_CONTROL_SUCCESS);
                   }
                   if (l2capinbuf[12] | (l2capinbuf[13] << 8) == L2CAP_INTERRUPT_DCID) {
-                     // Serial1.println(F("L2CAP_CMD_CONFIG_RESPONSE:L2CAP_INTERRUPT_DCID"));
+                     // // Serial1.println(F("L2CAP_CMD_CONFIG_RESPONSE:L2CAP_INTERRUPT_DCID"));
                      identifier = l2capinbuf[9];
                      l2cap_set_flag(L2CAP_FLAG_CONFIG_INTERRUPT_SUCCESS);
                   }
@@ -120,7 +120,7 @@ void XBOXONEBT::ACLData(uint8_t *l2capinbuf)
 
             case L2CAP_CMD_DISCONNECT_REQUEST:
                if (l2capinbuf[12] | (l2capinbuf[13] << 8) == L2CAP_CONTROL_DCID) {
-                  // Serial1.println(F("L2CAP_CMD_DISCONNECT_REQUEST:L2CAP_CONTROL_DCID"));
+                  // // Serial1.println(F("L2CAP_CMD_DISCONNECT_REQUEST:L2CAP_CONTROL_DCID"));
                   identifier = l2capinbuf[9];
                   pBtdssp->l2cap_disconnection_response(hci_handle,
                                                         identifier,
@@ -129,7 +129,7 @@ void XBOXONEBT::ACLData(uint8_t *l2capinbuf)
                   Reset();
                }
                if (l2capinbuf[12] | (l2capinbuf[13] << 8) == L2CAP_INTERRUPT_DCID) {
-                  // Serial1.println(F("L2CAP_CMD_DISCONNECT_REQUEST:L2CAP_INTERRUPT_DCID"));
+                  // // Serial1.println(F("L2CAP_CMD_DISCONNECT_REQUEST:L2CAP_INTERRUPT_DCID"));
                   identifier = l2capinbuf[9];
                   pBtdssp->l2cap_disconnection_response(hci_handle,
                                                         identifier,
@@ -142,13 +142,13 @@ void XBOXONEBT::ACLData(uint8_t *l2capinbuf)
             case L2CAP_CMD_DISCONNECT_RESPONSE:
                if (l2capinbuf[12] == control_scid[0] &&
                    l2capinbuf[13] == control_scid[1]) {
-                  // Serial1.println(F("L2CAP_CMD_DISCONNECT_RESPONSE:CONTROL"));
+                  // // Serial1.println(F("L2CAP_CMD_DISCONNECT_RESPONSE:CONTROL"));
                   identifier = l2capinbuf[9];
                   l2cap_set_flag(L2CAP_FLAG_DISCONNECT_CONTROL_RESPONSE);
                }
                if (l2capinbuf[12] == interrupt_scid[0] &&
                    l2capinbuf[13] == interrupt_scid[1]) {
-                  // Serial1.println(F("L2CAP_CMD_DISCONNECT_RESPONSE:INTERRUPT"));
+                  // // Serial1.println(F("L2CAP_CMD_DISCONNECT_RESPONSE:INTERRUPT"));
                   identifier = l2capinbuf[9];
                   l2cap_set_flag(L2CAP_FLAG_DISCONNECT_INTERRUPT_RESPONSE);
                }
@@ -159,32 +159,32 @@ void XBOXONEBT::ACLData(uint8_t *l2capinbuf)
       if (l2capinbuf[6] | (l2capinbuf[7] << 8) == L2CAP_INTERRUPT_DCID &&
           l2capinbuf[8] == HID_DATA_REQUEST_IN) {
 
-         // // Serial.println(l2capinbuf[0], HEX); /* 0x26 HCI handle with PB,BC flag LSB */
-         // // Serial.println(l2capinbuf[1], HEX); /* 0x20 HCI handle with PB,BC flag */
-         // // Serial.println(l2capinbuf[2], HEX); /* gamepad controls=0x16 (22) LSB */
-         // // Serial.println(l2capinbuf[3], HEX); /* 0x00 total length */
-         // // Serial.println(l2capinbuf[4], HEX); /* gamepad controls=0x12 (18) data length */
-         // // Serial.println(l2capinbuf[5], HEX); /* 0x00 data length */
-         // // Serial.println(l2capinbuf[6], HEX); /* 0x71 interrupt destination channel identifier (DCID) LSB */
-         // // Serial.println(l2capinbuf[7], HEX); /* 0x00 interrupt destination channel identifier (DCID) */
-         // // Serial.println(l2capinbuf[8], HEX); /* 0xA1 ? HID BT DATA_request (0xA0) | Report Type (Input 0x01) ? */
-         // // Serial.println(l2capinbuf[9], HEX); /* 0x01=gamepad controls */
-         // // Serial.println(l2capinbuf[10], BIN); /* LHAT X LSB */
-         // // Serial.println(l2capinbuf[11], BIN); /* LHAT X */
-         // // Serial.println(l2capinbuf[12], BIN); /* LHAT Y LSB */
-         // // Serial.println(l2capinbuf[13], BIN); /* LHAT Y */
-         // // Serial.println(l2capinbuf[14], BIN); /* RHAT X LSB */
-         // // Serial.println(l2capinbuf[15], BIN); /* RHAT X */
-         // // Serial.println(l2capinbuf[16], BIN); /* RHAT Y LSB */
-         // // Serial.println(l2capinbuf[17], BIN); /* RHAT Y */
-         // // Serial.println(l2capinbuf[18], BIN); /* LT MSB */
-         // // Serial.println(l2capinbuf[19], BIN); /* LT */
-         // // Serial.println(l2capinbuf[20], BIN); /* RT MSB */
-         // // Serial.println(l2capinbuf[21], BIN); /* RT */
-         // // Serial.println(l2capinbuf[22], BIN); /* UP=1, RIGHT=11, DOWN=101, LEFT=111 */
-         // // Serial.println(l2capinbuf[23], BIN); /* A=1, B=10, X=1000, Y=10000, LS=1000000, RS=10000000*/
-         // // Serial.println(l2capinbuf[24], BIN); /* START=1000, XBOX=10000, LHAT=100000, RHAT=1000000 */
-         // // Serial.println(l2capinbuf[25], BIN); /* BACK=1 */
+         // // Serial1.println(l2capinbuf[0], HEX); /* 0x26 HCI handle with PB,BC flag LSB */
+         // // Serial1.println(l2capinbuf[1], HEX); /* 0x20 HCI handle with PB,BC flag */
+         // // Serial1.println(l2capinbuf[2], HEX); /* gamepad controls=0x16 (22) LSB */
+         // // Serial1.println(l2capinbuf[3], HEX); /* 0x00 total length */
+         // // Serial1.println(l2capinbuf[4], HEX); /* gamepad controls=0x12 (18) data length LSB */
+         // // Serial1.println(l2capinbuf[5], HEX); /* 0x00 data length */
+         // // Serial1.println(l2capinbuf[6], HEX); /* 0x71 interrupt destination channel identifier (DCID) LSB */
+         // // Serial1.println(l2capinbuf[7], HEX); /* 0x00 interrupt destination channel identifier (DCID) */
+         // // Serial1.println(l2capinbuf[8], HEX); /* 0xA1 ? HID BT DATA_request (0xA0) | Report Type (Input 0x01) ? */
+         // // Serial1.println(l2capinbuf[9], HEX); /* 0x01=gamepad controls */
+         // // Serial1.println(l2capinbuf[10], BIN); /* LHAT X LSB */
+         // // Serial1.println(l2capinbuf[11], BIN); /* LHAT X */
+         // // Serial1.println(l2capinbuf[12], BIN); /* LHAT Y LSB */
+         // // Serial1.println(l2capinbuf[13], BIN); /* LHAT Y */
+         // // Serial1.println(l2capinbuf[14], BIN); /* RHAT X LSB */
+         // // Serial1.println(l2capinbuf[15], BIN); /* RHAT X */
+         // // Serial1.println(l2capinbuf[16], BIN); /* RHAT Y LSB */
+         // // Serial1.println(l2capinbuf[17], BIN); /* RHAT Y */
+         // // Serial1.println(l2capinbuf[18], BIN); /* LT MSB */
+         // // Serial1.println(l2capinbuf[19], BIN); /* LT */
+         // // Serial1.println(l2capinbuf[20], BIN); /* RT MSB */
+         // // Serial1.println(l2capinbuf[21], BIN); /* RT */
+         // // Serial1.println(l2capinbuf[22], BIN); /* UP=1, RIGHT=11, DOWN=101, LEFT=111 */
+         // // Serial1.println(l2capinbuf[23], BIN); /* A=1, B=10, X=1000, Y=10000, LS=1000000, RS=10000000*/
+         // // Serial1.println(l2capinbuf[24], BIN); /* START=1000, XBOX=10000, LHAT=100000, RHAT=1000000 */
+         // // Serial1.println(l2capinbuf[25], BIN); /* BACK=1 */
 
          Data = (XboxOneBT_Data_t *)&l2capinbuf[10];
       }
@@ -199,7 +199,6 @@ void XBOXONEBT::L2CAP_task()
       case L2CAP_CONTROL_SUCCESS:
          if (l2cap_check_flag(L2CAP_FLAG_CONFIG_CONTROL_SUCCESS)) {
             // Serial1.println(F("HID control successfully configured."));
-            setProtocol();
             l2cap_state = L2CAP_INTERRUPT_SETUP;
          }
          break;
@@ -207,12 +206,6 @@ void XBOXONEBT::L2CAP_task()
       case L2CAP_INTERRUPT_SETUP:
          if (l2cap_check_flag(L2CAP_FLAG_CONNECTION_INTERRUPT_REQUEST)) {
             // Serial1.println(F("HID interrupt incoming connection request."));
-            pBtdssp->l2cap_connection_response(hci_handle,
-                                               identifier,
-                                               interrupt_dcid,
-                                               interrupt_scid,
-                                               PENDING);
-            delay(1);
             pBtdssp->l2cap_connection_response(hci_handle,
                                                identifier,
                                                interrupt_dcid,
@@ -232,6 +225,7 @@ void XBOXONEBT::L2CAP_task()
          if (l2cap_check_flag(L2CAP_FLAG_CONTROL_CONNECTED)) {
             // Serial1.println(F("Send HID control config request."));
             identifier++;
+            l2cap_clear_flag(L2CAP_FLAG_CONFIG_CONTROL_SUCCESS);
             pBtdssp->l2cap_config_request(hci_handle,
                                           identifier,
                                           control_scid);
@@ -241,10 +235,9 @@ void XBOXONEBT::L2CAP_task()
 
       case L2CAP_CONTROL_CONFIG_REQUEST:
          if (l2cap_check_flag(L2CAP_FLAG_CONFIG_CONTROL_SUCCESS)) {
-            setProtocol();
-            delay(1);
-            // Serial1.println(F("Send HID interrupt connection request."));
+            // Serial1.println(F("Send HID interrupt connect request."));
             identifier++;
+            l2cap_clear_flag(L2CAP_FLAG_INTERRUPT_CONNECTED);
             pBtdssp->l2cap_connection_request(hci_handle,
                                               identifier,
                                               interrupt_dcid,
@@ -255,8 +248,9 @@ void XBOXONEBT::L2CAP_task()
 
       case L2CAP_INTERRUPT_CONNECT_REQUEST:
          if (l2cap_check_flag(L2CAP_FLAG_INTERRUPT_CONNECTED)) {
-            // Serial1.printlnF(("Send HID interrupt config request."));
+            // Serial1.println(F("Send HID interrupt config request."));
             identifier++;
+            l2cap_clear_flag(L2CAP_FLAG_CONFIG_INTERRUPT_SUCCESS);
             pBtdssp->l2cap_config_request(hci_handle,
                                           identifier,
                                           interrupt_scid);
@@ -309,12 +303,13 @@ void XBOXONEBT::Run()
           !pBtdssp->l2capConnectionClaimed &&
           !connected &&
           !activeConnection) {
-         // Serial1.println(F("Send HID control connection request."));
+         // Serial1.println(F("Send HID control connection request after successful pairing."));
          pBtdssp->l2capConnectionClaimed = true;
          activeConnection                = true;
          hci_handle                      = pBtdssp->hci_handle;
          l2cap_event_flag                = 0;
          identifier                      = 0;
+
          pBtdssp->l2cap_connection_request(hci_handle,
                                            identifier,
                                            control_dcid,
@@ -324,24 +319,20 @@ void XBOXONEBT::Run()
       }
 
       if (l2cap_check_flag(L2CAP_FLAG_CONNECTION_CONTROL_REQUEST)) {
-         // Serial1.println(F("HID control incoming connection request."));
-         pBtdssp->l2cap_connection_response(hci_handle,
-                                            identifier,
-                                            control_dcid,
-                                            control_scid,
-                                            PENDING);
-         delay(1);
+         // Serial1.println(F("HID control incoming connection request from paired device."));
          pBtdssp->l2cap_connection_response(hci_handle,
                                             identifier,
                                             control_dcid,
                                             control_scid,
                                             SUCCESSFUL);
-         identifier++;
+         l2cap_state = L2CAP_CONTROL_SUCCESS;
+
          delay(1);
+         identifier++;
          pBtdssp->l2cap_config_request(hci_handle,
                                        identifier,
                                        control_scid);
-         l2cap_state = L2CAP_CONTROL_SUCCESS;
+         // l2cap_state = L2CAP_CONTROL_CONFIG_REQUEST;
          return;
       }
    }
@@ -349,7 +340,7 @@ void XBOXONEBT::Run()
 
 void XBOXONEBT::setProtocol()
 {
-   // Serial1.println(F("Set protocol mode."));
+   // Serial1.print(F("Set protocol mode: "));
    uint8_t command = 0x70 | HID_RPT_PROTOCOL;
    // Serial1.println(command, HEX);
    pBtdssp->L2CAP_Command(hci_handle,

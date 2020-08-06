@@ -290,19 +290,19 @@ void XBOXONEBTSSP::EndpointXtract(uint8_t conf,
    epInfo[index].epAddr     = (pep->bEndpointAddress & 0x0F);
    epInfo[index].maxPktSize = (uint8_t)pep->wMaxPacketSize;
 
-   // // // Serial1.println(F("Endpoint descriptor."));
-   // // // Serial1.print(F("Length: "));
-   // // // Serial1.print(pep->bLength, HEX);
-   // // // Serial1.print(F("Type: "));
-   // // // Serial1.print(pep->bDescriptorType, HEX);
-   // // // Serial1.print(F("Address: "));
-   // // // Serial1.print(pep->bEndpointAddress, HEX);
-   // // // Serial1.print(F("Attributes: "));
-   // // // Serial1.print(pep->bmAttributes, HEX);
-   // // // Serial1.print(F("MaxPktSize: "));
-   // // // Serial1.print(pep->wMaxPacketSize, HEX);
-   // // // Serial1.print(F("Poll Interval: "));
-   // // // Serial1.print(pep->bInterval, HEX);
+   // // Serial1.println(F("Endpoint descriptor."));
+   // // Serial1.print(F("Length: "));
+   // // Serial1.print(pep->bLength, HEX);
+   // // Serial1.print(F("Type: "));
+   // // Serial1.print(pep->bDescriptorType, HEX);
+   // // Serial1.print(F("Address: "));
+   // // Serial1.print(pep->bEndpointAddress, HEX);
+   // // Serial1.print(F("Attributes: "));
+   // // Serial1.print(pep->bmAttributes, HEX);
+   // // Serial1.print(F("MaxPktSize: "));
+   // // Serial1.print(pep->wMaxPacketSize, HEX);
+   // // Serial1.print(F("Poll Interval: "));
+   // // Serial1.print(pep->bInterval, HEX);
 
    /* Set the polling interval as the largest obtained from endpoints */
    if (pollInterval < pep->bInterval) pollInterval = pep->bInterval;
@@ -398,9 +398,10 @@ void XBOXONEBTSSP::HCI_event_task()
                   /* Check if it is a gamepad see: 
                      http://bluetooth-pentest.narod.ru/software/bluetooth_class_of_device-service_generator.html */
                   if (pairWithHIDDevice &&
-                      (classOfDevice[1] & 0x05) &&
-                      (classOfDevice[0] & 0x08)) {
-                     // Serial1.println(F("Gamepad found."));
+                      (classOfDevice[2] == 0x00) &&
+                      (classOfDevice[1] == 0x05) &&
+                      (classOfDevice[0] == 0x08)) {
+                     // Serial1.println(F("Xbox gamepad device class found."));
 
                      for (uint8_t k = 0; k < 6; k++)
                         disc_bdaddr[k] = hcibuf[k + 3 + 6 * i];
@@ -502,7 +503,7 @@ void XBOXONEBTSSP::HCI_event_task()
          case EV_LINK_KEY_REQUEST:
             /* UseSimplePairing */
             // Serial1.println(F("Link key request."));
-            // Serial1.print(F("pairWithHIDDevice: "));
+            // Serial1.print(F("Pair with HID device: "));
             // Serial1.println(pairWithHIDDevice, HEX);
             if ((!pairWithHIDDevice) || (incomingHIDDevice)) {
                for (uint8_t i = 0; i < 16; i++) {
@@ -511,7 +512,7 @@ void XBOXONEBTSSP::HCI_event_task()
                hci_link_key_request_reply();
             } else {
                hci_link_key_request_negative_reply();
-               // Serial1.println(F("Start Simple Pairing."));
+               // Serial1.println(F("Start simple pairing."));
             }
             break;
 
@@ -526,12 +527,13 @@ void XBOXONEBTSSP::HCI_event_task()
             break;
 
          case EV_USER_CONFIRMATION_REQUEST:
-            // Serial1.print(F("User confirmation request: "));
-            for (uint8_t i = 0; i < 4; i++) {
-               // Serial1.print(F(" "));
-               // Serial1.print(hcibuf[8 + i], HEX);
-            }
-            // Serial1.println(F(""));
+            // Serial1.print(F("Received user confirmation request: "));
+            // Serial1.print(hcibuf[8], HEX);
+            // Serial1.print(F(" "));
+            // Serial1.print(hcibuf[9], HEX);
+            // Serial1.print(F(" "));
+            // Serial1.println(hcibuf[10], HEX);
+
             hci_user_confirmation_request_reply();
             break;
 
@@ -541,7 +543,7 @@ void XBOXONEBTSSP::HCI_event_task()
 
          case EV_LINK_KEY_NOTIFICATION:
             /* UseSimplePairing */
-            // Serial1.println(F("Link key notification."));
+            // Serial1.println(F("Received link key."));
             // Serial1.println(F("EEPROM write disc_bdaddr."));
             for (uint8_t i = 0; i < 6; i++) {
                EEPROM.write(i, disc_bdaddr[i]);
@@ -556,9 +558,9 @@ void XBOXONEBTSSP::HCI_event_task()
             break;
 
          case EV_AUTHENTICATION_COMPLETE:
-            /* Check if pairing was successful */
             if (!hcibuf[2]) {
                // Serial1.println(F("Authentication complete."));
+               /* Pairing successful */
                if (pairWithHIDDevice && !connectToHIDDevice) {
                   // Serial1.println(F("Pairing successful with HID device."));
                   /* Used to indicate to the BTHID service, that it should 
@@ -566,9 +568,14 @@ void XBOXONEBTSSP::HCI_event_task()
                   connectToHIDDevice = true;
                }
                hci_set_connection_encryption(hci_handle);
-               hci_state = HCI_DONE_STATE;
+               /* Clear these flags for a new connection */
+               l2capConnectionClaimed  = false;
+               sdpConnectionClaimed    = false;
+               rfcommConnectionClaimed = false;
+               hci_event_flag          = 0;
+               hci_state               = HCI_DONE_STATE;
             } else {
-               // Serial1.print(F("Pairing Failed:"));
+               // Serial1.print(F("Pairing Failed: "));
                // Serial1.println(hcibuf[2], HEX);
                hci_disconnect(hci_handle);
                hci_state = HCI_DISCONNECT_STATE;
@@ -577,32 +584,21 @@ void XBOXONEBTSSP::HCI_event_task()
 
          /* We will just ignore the following events */
          case EV_ENCRYPTION_CHANGE:
-            /* UseSimplePairing */
-            if (!hcibuf[2]) {
-               // Serial1.println(F("Encryption changed."));
-            }
-            break;
-
          case EV_MAX_SLOTS_CHANGE:
          case EV_NUMBER_OF_COMPLETED_PACKETS:
          case EV_ROLE_CHANGED:
          case EV_PAGE_SCAN_REPETITION_MODE_CHANGE:
-            break;
-
          case EV_LOOPBACK_COMMAND:
          case EV_DATA_BUFFER_OVERFLOW:
          case EV_CHANGE_CONNECTION_LINK_KEY_COMPLETE:
          case EV_QOS_SETUP_COMPLETE:
          case EV_READ_REMOTE_VERSION_INFORMATION_COMPLETE:
-            if (hcibuf[0] != 0x00) {
-               // // Serial1.println(F("Ignore HCI Event."));
-            }
             break;
-         default:
-            if (hcibuf[0] != 0x00) {
-               // // Serial1.println(F("Unmanaged HCI Event."));
-            }
-            break;
+            // default:
+            //    if (hcibuf[0] != 0x00) {
+            //       // Serial1.println(F("Unmanaged HCI Event."));
+            //    }
+            //    break;
       }
    } else {
       // Serial1.print(F("HCI event error: "));
@@ -690,7 +686,7 @@ void XBOXONEBTSSP::HCI_task()
 
       case HCI_CHECK_DEVICE_SERVICE:
          // Serial1.println(F("Check device service."));
-         // Serial1.print(F("pairWithHIDDevice: "));
+         // Serial1.print(F("Pair with HID device: "));
          // Serial1.println(pairWithHIDDevice, HEX);
          if (pairWithHIDDevice) {
             // Serial1.println(F("Please enable discovery of your device."));
@@ -714,11 +710,15 @@ void XBOXONEBTSSP::HCI_task()
       case HCI_REMOTE_NAME_STATE:
          if (hci_check_flag(HCI_FLAG_REMOTE_NAME_COMPLETE)) {
             if (strncmp((const char *)remote_name, GAMEPAD_REMOTE_NAME, sizeof(GAMEPAD_REMOTE_NAME) - 1) == 0) {
-               if (pairWithHIDDevice)
+               if (pairWithHIDDevice) {
+                  // Serial1.println("Connect to the new device.");
                   hci_state = HCI_CONNECT_DEVICE_STATE;
-               else
+               } else {
+                  // Serial1.println("Check for paired device address.");
                   hci_state = HCI_CHECK_DISC_BDADDR_STATE;
+               }
             } else {
+               // Serial1.println(F("Continue searching."));
                hci_state = HCI_CHECK_DEVICE_SERVICE;
             }
          }
@@ -791,12 +791,7 @@ void XBOXONEBTSSP::HCI_task()
 
       case HCI_CONNECTED_STATE:
          if (hci_check_flag(HCI_FLAG_CONNECT_COMPLETE)) {
-            // Serial1.print(F("Connected to device: "));
-            for (int8_t i = 5; i > 0; i--) {
-               // Serial1.print(disc_bdaddr[i], HEX);
-               // Serial1.print(F(":"));
-            }
-            // Serial1.println(disc_bdaddr[0], HEX);
+            // Serial1.print(F("Connected to device."));
             /* Clear these flags for a new connection */
             l2capConnectionClaimed  = false;
             sdpConnectionClaimed    = false;
@@ -807,11 +802,6 @@ void XBOXONEBTSSP::HCI_task()
          break;
 
       case HCI_DONE_STATE:
-         if (hci_check_flag(HCI_FLAG_DISCONNECT_COMPLETE)) {
-            // Serial1.println(F("Disconnect complete."));
-            hci_state = HCI_DISCONNECTED_STATE;
-         }
-
          hci_counter++;
          /* Wait until we have looped 1000 times to make sure that the L2CAP 
             connection has been started */
@@ -822,24 +812,19 @@ void XBOXONEBTSSP::HCI_task()
          break;
 
       case HCI_DISCONNECT_STATE:
-         /* Stay until disconnect */
          if (hci_check_flag(HCI_FLAG_DISCONNECT_COMPLETE)) {
-            // Serial1.println(F("Disconnect complete."));
-            hci_state = HCI_DISCONNECTED_STATE;
+            // Serial1.println(F("HCI disconnected from device."));
+            disconnect();
+            /* Clear all flags and reset all buffers */
+            hci_event_flag = 0;
+            memset(hcibuf, 0, BULK_MAXPKTSIZE);
+            memset(l2capinbuf, 0, BULK_MAXPKTSIZE);
+            connectToHIDDevice = false;
+            incomingHIDDevice  = false;
+            pairWithHIDDevice  = false;
+            hci_state          = HCI_SCANNING_STATE;
+            break;
          }
-         break;
-
-      case HCI_DISCONNECTED_STATE:
-         // Serial1.println(F("HCI disconnected from device."));
-         disconnect();
-         /* Clear all flags and reset all buffers */
-         hci_event_flag = 0;
-         memset(hcibuf, 0, BULK_MAXPKTSIZE);
-         memset(l2capinbuf, 0, BULK_MAXPKTSIZE);
-         connectToHIDDevice = false;
-         incomingHIDDevice  = false;
-         pairWithHIDDevice  = false;
-         hci_state          = HCI_SCANNING_STATE;
          break;
    }
 }
@@ -1090,13 +1075,14 @@ void XBOXONEBTSSP::hci_set_connection_encryption(uint16_t handle)
 void XBOXONEBTSSP::hci_inquiry()
 {
    hci_clear_flag(HCI_FLAG_DEVICE_FOUND);
+
    hcibuf[0] = 0x01;
    hcibuf[1] = 0x01 << 2; /* HCI OGF = 1 */
    hcibuf[2] = 0x05;      /* Parameter Total Length = 5 */
-   hcibuf[3] = 0x33;      /* LAP: Genera/Unlimited Inquiry Access Code (GIAC = 0x9E8B33) - see https://www.bluetooth.org/Technical/AssignedNumbers/baseband.htm */
+   hcibuf[3] = 0x33;      /* General/unlimited inquiry access code (GIAC) 0x9E8B33 */
    hcibuf[4] = 0x8B;
    hcibuf[5] = 0x9E;
-   hcibuf[6] = 0x30; /* Inquiry time = 61.44 sec (maximum) */
+   hcibuf[6] = 0x30; /* Inquiry time 61.44 sec (maximum) */
    hcibuf[7] = 0x0A; /* 10 number of responses */
 
    HCI_Command(hcibuf, 8);
@@ -1140,6 +1126,7 @@ void XBOXONEBTSSP::hci_connect(uint8_t *bdaddr)
 void XBOXONEBTSSP::hci_disconnect(uint16_t handle)
 {
    hci_clear_flag(HCI_FLAG_DISCONNECT_COMPLETE);
+
    hcibuf[0] = 0x06;                            /* HCI OCF = 6 */
    hcibuf[1] = 0x01 << 2;                       /* HCI OGF = 1 */
    hcibuf[2] = 0x03;                            /* parameter length = 3 */
@@ -1156,8 +1143,8 @@ void XBOXONEBTSSP::hci_write_class_of_device()
    hcibuf[0] = 0x24;      /* HCI OCF = 24 */
    hcibuf[1] = 0x03 << 2; /* HCI OGF = 3 */
    hcibuf[2] = 0x03;      /* parameter length = 3 */
-   hcibuf[3] = 0x04;      /* Robot */
-   hcibuf[4] = 0x08;      /* Toy */
+   hcibuf[3] = 0x0C;      /* Smartphone */
+   hcibuf[4] = 0x02;      /* Phone */
    hcibuf[5] = 0x00;
 
    HCI_Command(hcibuf, 6);
@@ -1354,41 +1341,3 @@ void XBOXONEBTSSP::l2cap_information_response(uint16_t handle,
 
    L2CAP_Command(handle, l2capoutbuf, 12);
 }
-
-int8_t XBOXONEBTSSP::registerBluetoothService(BluetoothService *pService)
-{
-   for (uint8_t i = 0; i < BTDSSP_NUM_SERVICES; i++) {
-      if (!btService[i]) {
-         btService[i] = pService;
-         return i; /* Return ID */
-      }
-   }
-   return -1; /* Error registering BluetoothService */
-};
-
-void XBOXONEBTSSP::pairWithHID()
-{
-   waitingForConnection = false;
-   pairWithHIDDevice    = true;
-   hci_state            = HCI_CHECK_DEVICE_SERVICE;
-};
-
-uint8_t XBOXONEBTSSP::readPollInterval()
-{
-   return pollInterval;
-};
-
-uint8_t XBOXONEBTSSP::GetAddress()
-{
-   return bAddress;
-};
-
-bool XBOXONEBTSSP::isReady()
-{
-   return bPollEnable;
-};
-
-bool XBOXONEBTSSP::DEVCLASSOK(uint8_t klass)
-{
-   return (klass == USB_CLASS_WIRELESS_CTRL);
-};

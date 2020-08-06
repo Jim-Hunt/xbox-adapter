@@ -210,14 +210,45 @@ public:
    void l2cap_disconnection_request(uint16_t handle, uint8_t rxid, uint8_t *dcid, uint8_t *scid);
    void l2cap_disconnection_response(uint16_t handle, uint8_t rxid, uint8_t *dcid, uint8_t *scid);
    void l2cap_information_response(uint16_t handle, uint8_t rxid, uint8_t infoTypeLow, uint8_t infoTypeHigh);
-   void pairWithHID();
-   uint8_t readPollInterval();
-   uint8_t GetAddress();
-   bool isReady();
-   bool DEVCLASSOK(uint8_t klass);
-   void EndpointXtract(uint8_t conf, uint8_t iface, uint8_t alt, uint8_t proto, const USB_ENDPOINT_DESCRIPTOR *ep);
+
+   void pairWithHID()
+   {
+      waitingForConnection = false;
+      pairWithHIDDevice    = true;
+      hci_state            = HCI_CHECK_DEVICE_SERVICE;
+   };
+   uint8_t readPollInterval()
+   {
+      return pollInterval;
+   };
+   virtual uint8_t GetAddress()
+   {
+      return bAddress;
+   };
+   virtual bool isReady()
+   {
+      return bPollEnable;
+   };
+   virtual bool DEVCLASSOK(uint8_t klass)
+   {
+      return (klass == USB_CLASS_WIRELESS_CTRL);
+   };
+   void EndpointXtract(uint8_t conf,
+                       uint8_t iface,
+                       uint8_t alt,
+                       uint8_t proto,
+                       const USB_ENDPOINT_DESCRIPTOR *ep);
    void disconnect();
-   int8_t registerBluetoothService(BluetoothService *pService);
+   int8_t registerBluetoothService(BluetoothService *pService)
+   {
+      for (uint8_t i = 0; i < BTDSSP_NUM_SERVICES; i++) {
+         if (!btService[i]) {
+            btService[i] = pService;
+            return i; /* Return ID */
+         }
+      }
+      return -1; /* Error registering BluetoothService */
+   };
 
    bool waitingForConnection;
    bool l2capConnectionClaimed;
@@ -236,7 +267,6 @@ public:
 
 protected:
    void PrintEndpointDescriptor(const USB_ENDPOINT_DESCRIPTOR *ep_ptr);
-
    USB *pUsb;
    uint8_t bAddress;
    EpInfo epInfo[BTDSSP_MAX_ENDPOINTS];
@@ -253,7 +283,6 @@ private:
    void HCI_event_task();
    void HCI_task();
    void ACL_event_task();
-
    BluetoothService *btService[BTDSSP_NUM_SERVICES];
    uint16_t PID;
    uint16_t VID;
@@ -280,6 +309,10 @@ public:
       if (pBtdssp)
          pBtdssp->registerBluetoothService(this);
    };
+   void attachOnInit(void (*funcOnInit)(void))
+   {
+      pFuncOnInit = funcOnInit;
+   };
    virtual void ACLData(uint8_t *ACLData) = 0;
    virtual void Run()                     = 0;
    virtual void Reset()                   = 0;
@@ -291,6 +324,7 @@ protected:
       return (buf[0] == (handle & 0xFF)) && (buf[1] == ((handle >> 8) | 0x20));
    }
    virtual void onInit() = 0;
+   void (*pFuncOnInit)(void);
    XBOXONEBTSSP *pBtdssp;
    uint16_t hci_handle;
    uint32_t l2cap_event_flag;
