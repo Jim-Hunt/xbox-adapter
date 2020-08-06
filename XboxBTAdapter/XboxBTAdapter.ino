@@ -1,17 +1,14 @@
-#include "XboxDuke.h"
 #include "XBOXONEBT.h"
+#include "XboxDuke.h"
 
 #define LED_BLINK_CONNECTED 5000
-#define LED_BLINK_WAITING 1000
-#define LED_BLINK_PAIRING 200
+#define LED_BLINK_WAITING   1000
+#define LED_BLINK_PAIRING   200
+#define PAIR_DELAY          30000
 
 USB UsbHost;
 XBOXONEBTSSP XboxOneBTSSP(&UsbHost);
-/* This will start an inquiry and then pair with your device. */
-// XBOXONEBT XboxOneBT(&XboxOneBTSSP, PAIR);
-/* After that you can simply create the instance like so. */
 XBOXONEBT XboxOneBT(&XboxOneBTSSP);
-
 XboxDuke_Data_t XboxDuke;
 
 void setup()
@@ -19,6 +16,8 @@ void setup()
    pinMode(LED_BUILTIN, OUTPUT);
    XboxDuke_Init();
    UsbHost.Init();
+
+   static uint32_t pairingTimer = millis() + 30000;
 }
 
 void loop()
@@ -72,6 +71,8 @@ void loop()
    XboxDuke_USBTask();
 
    blink();
+
+   pair();
 }
 
 void blink()
@@ -87,5 +88,18 @@ void blink()
          timer = millis() + LED_BLINK_WAITING;
 
       digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+   }
+}
+
+void pair()
+{
+   uint32_t static timer = millis() + PAIR_DELAY;
+
+   if (timer && XboxOneBT.XboxOneBTConnected)
+      timer = 0;
+
+   if (timer && millis() > timer) {
+      XboxOneBTSSP.pairWithHID();
+      timer = 0;
    }
 }
