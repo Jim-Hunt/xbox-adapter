@@ -407,10 +407,16 @@ void XBOXONEBTSSP::HCI_event_task()
                         disc_bdaddr[k] = hcibuf[k + 3 + 6 * i];
 
                      // Serial1.print(F("Device address: "));
-                     for (int8_t n = 5; n > 0; n--) {
-                        // Serial1.print(disc_bdaddr[n], HEX);
-                        // Serial1.print(F(":"));
-                     }
+                     // Serial1.print(disc_bdaddr[5], HEX);
+                     // Serial1.print(F(":"));
+                     // Serial1.print(disc_bdaddr[4], HEX);
+                     // Serial1.print(F(":"));
+                     // Serial1.print(disc_bdaddr[3], HEX);
+                     // Serial1.print(F(":"));
+                     // Serial1.print(disc_bdaddr[2], HEX);
+                     // Serial1.print(F(":"));
+                     // Serial1.print(disc_bdaddr[1], HEX);
+                     // Serial1.print(F(":"));
                      // Serial1.println(disc_bdaddr[0], HEX);
 
                      hci_set_flag(HCI_FLAG_DEVICE_FOUND);
