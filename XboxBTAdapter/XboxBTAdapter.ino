@@ -16,8 +16,6 @@ void setup()
    pinMode(LED_BUILTIN, OUTPUT);
    XboxDuke_Init();
    UsbHost.Init();
-
-   static uint32_t pairingTimer = millis() + 30000;
 }
 
 void loop()
