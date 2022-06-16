@@ -1,0 +1,3 @@
+[submodule "bluepad32-nina/external/btstack"]
+	path = bluepad32-nina/external/btstack
+	url = https://github.com/bluekitchen/btstack.git
