@@ -7,8 +7,10 @@
 *.swo
 
 # Distribution files, used internally and build files
-dist/
+dist/*
+!dist/bluepad32-nina-xbox-adapter/
 build/
+build_plat_*/
 tools/fw/bluepad32-*
 src/components/btstack/
 
