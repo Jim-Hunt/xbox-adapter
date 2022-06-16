@@ -481,9 +481,13 @@ void uni_hid_parser_xboxone_set_rumble_2(uni_hid_device_t* d, uint8_t l_value, u
         uint8_t loop_count;  // how many times "duration" is repeated
     } __attribute__((packed));
 
-    // TODO: It seems that the max value is 127. Double check
-    l_value /= 2;
-    r_value /= 2;
+    // // TODO: It seems that the max value is 127. Double check
+    // l_value /= 2;
+    // r_value /= 2;
+    
+    // HID descriptor says max is 100.
+    l_value = 100L * l_value / 255;
+    r_value = 100L * r_value / 255;
 
     struct ff_report ff = {
         .transaction_type = (HID_MESSAGE_TYPE_DATA << 4) | HID_REPORT_TYPE_OUTPUT,

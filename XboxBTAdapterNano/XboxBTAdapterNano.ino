@@ -120,8 +120,8 @@ void loop() {
       
       // Xbox rumble 
       uint8_t l_rumble, r_rumble, duration;
-      l_rumble = (xpad_rumble.lValue >> 8) * 200 / UINT8_MAX;
-      r_rumble = (xpad_rumble.rValue >> 8) * 200 / UINT8_MAX;
+      l_rumble = xpad_rumble.lValue >> 8;
+      r_rumble = xpad_rumble.rValue >> 8;
       duration = (l_rumble > 0x00 || r_rumble > 0x00) ? 0xFF : 0x00;
 
       // Bluepad32 takes just one rumble value sending it to all rumble motors.
