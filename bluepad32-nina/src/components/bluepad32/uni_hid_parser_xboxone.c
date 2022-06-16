@@ -452,6 +452,55 @@ void uni_hid_parser_xboxone_set_rumble(uni_hid_device_t* d, uint8_t value, uint8
     uni_hid_device_send_intr_report(d, (uint8_t*)&ff, sizeof(ff));
 }
 
+void uni_hid_parser_xboxone_set_rumble_2(uni_hid_device_t* d, uint8_t l_value, uint8_t r_value, uint8_t duration) {
+    if (d == NULL) {
+        loge("Xbox One: Invalid device\n");
+        return;
+    }
+
+    // Actuators for the force feedback (FF).
+    enum {
+        FF_RIGHT = 1 << 0,
+        FF_LEFT = 1 << 1,
+        FF_TRIGGER_RIGHT = 1 << 2,
+        FF_TRIGGER_LEFT = 1 << 3,
+    };
+
+    struct ff_report {
+        // Report related
+        uint8_t transaction_type;  // type of transaction
+        uint8_t report_id;         // report id
+        // Force-feedback related
+        uint8_t enable_actuators;    // LSB 0-3 for each actuator
+        uint8_t force_left_trigger;  // HID descriptor says that it goes from 0-100
+        uint8_t force_right_trigger;
+        uint8_t force_left;
+        uint8_t force_right;
+        uint8_t duration;  // unknown unit, 255 is ~second
+        uint8_t start_delay;
+        uint8_t loop_count;  // how many times "duration" is repeated
+    } __attribute__((packed));
+
+    // TODO: It seems that the max value is 127. Double check
+    l_value /= 2;
+    r_value /= 2;
+
+    struct ff_report ff = {
+        .transaction_type = (HID_MESSAGE_TYPE_DATA << 4) | HID_REPORT_TYPE_OUTPUT,
+        .report_id = 0x03,  // taken from HID descriptor
+        .enable_actuators = FF_RIGHT | FF_LEFT | FF_TRIGGER_LEFT | FF_TRIGGER_RIGHT,
+        .force_left_trigger = 0,
+        .force_right_trigger = 0,
+        .force_left = l_value,
+        .force_right = r_value,
+        .duration = duration,
+        .start_delay = 0,
+        .loop_count = 0,
+    };
+
+    uni_hid_device_send_intr_report(d, (uint8_t*)&ff, sizeof(ff));
+}
+
 //
 // Helpers
 //

@@ -10,6 +10,7 @@
 dist/
 build/
 tools/fw/bluepad32-*
+/src/components/btstack/
 
 # Xcode
 *.mode*v*

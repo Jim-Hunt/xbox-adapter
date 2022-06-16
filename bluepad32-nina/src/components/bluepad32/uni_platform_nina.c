@@ -172,6 +172,7 @@ enum {
     PENDING_REQUEST_CMD_LIGHTBAR_COLOR = 1,
     PENDING_REQUEST_CMD_PLAYER_LEDS = 2,
     PENDING_REQUEST_CMD_RUMBLE = 3,
+    PENDING_REQUEST_CMD_RUMBLE_2 = 4,
 };
 
 typedef struct {
@@ -383,6 +384,31 @@ static int request_get_gamepad_properties(const uint8_t command[], uint8_t respo
     return 6 + sizeof(nina_gamepad_properties_t);
 }
 
+// Command 0x07
+static int request_set_gamepad_rumble_2(const uint8_t command[], uint8_t response[]) {
+    // command[2]: total params
+    // command[3]: param len
+    int idx = command[4];
+    // command[5]: param len
+    // command[6,7,8]: l_force, r_force, duration
+
+    pending_request_t request = (pending_request_t){
+        .device_idx = idx,
+        .cmd = PENDING_REQUEST_CMD_RUMBLE_2,
+        .args[0] = command[6],
+        .args[1] = command[7],
+        .args[2] = command[8],
+    };
+    xQueueSendToBack(_pending_queue, &request, (TickType_t)0);
+
+    // TODO: We really don't know whether this request will succeed
+    response[2] = 1;  // Number of parameters
+    response[3] = 1;  // Param len
+    response[4] = RESPONSE_OK;
+
+    return 5;
+}
+
 // Command 0x1a
 static int request_set_debug(const uint8_t command[], uint8_t response[]) {
     uni_esp32_enable_uart_output(command[4]);
@@ -499,7 +525,7 @@ const command_handler_t command_handlers[] = {
     request_set_gamepad_rumble,       // available on DS4, Xbox, Switch, etc.
     request_forget_bluetooth_keys,    // forget stored Bluetooth keys
     request_get_gamepad_properties,   // get gamepad properties like BTAddr, VID/PID, etc.
-    NULL,
+    request_set_gamepad_rumble_2,
     NULL,
     NULL,
     NULL,
@@ -776,6 +802,11 @@ static void process_pending_requests(void) {
                     d->report_parser.set_rumble(d, request.args[0], request.args[1]);
                 break;
 
+            case PENDING_REQUEST_CMD_RUMBLE_2:
+                if (d->report_parser.set_rumble_2 != NULL)
+                    d->report_parser.set_rumble_2(d, request.args[0], request.args[1], request.args[2]);
+                break;
+
             default:
                 loge("NINA: Invalid pending command: %d\n", request.cmd);
         }
@@ -876,6 +907,7 @@ static int nina_on_device_ready(uni_hid_device_t* d) {
     _gamepads_properties[idx].product_id = d->product_id;
     _gamepads_properties[idx].flags = (d->report_parser.set_player_leds ? PROPERTY_FLAG_PLAYER_LEDS : 0) |
                                       (d->report_parser.set_rumble ? PROPERTY_FLAG_RUMBLE : 0) |
+                                      (d->report_parser.set_rumble_2 ? PROPERTY_FLAG_RUMBLE : 0) |
                                       (d->report_parser.set_lightbar_color ? PROPERTY_FLAG_PLAYER_LIGHTBAR : 0);
 
     memcpy(_gamepads_properties[ins->gamepad_idx].btaddr, d->conn.btaddr, sizeof(_gamepads_properties[0].btaddr));

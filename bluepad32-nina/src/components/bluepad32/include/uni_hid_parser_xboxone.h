@@ -31,5 +31,11 @@ void uni_hid_parser_xboxone_parse_usage(struct uni_hid_device_s* d,
                                         uint16_t usage_page,
                                         uint16_t usage,
                                         int32_t value);
-void uni_hid_parser_xboxone_set_rumble(struct uni_hid_device_s* d, uint8_t value, uint8_t duration);
+void uni_hid_parser_xboxone_set_rumble(struct uni_hid_device_s* d, 
+                                        uint8_t value, 
+                                        uint8_t duration);
+void uni_hid_parser_xboxone_set_rumble_2(struct uni_hid_device_s* d, 
+                                        uint8_t l_value,
+                                        uint8_t r_value, 
+                                        uint8_t duration);
 #endif  // UNI_HID_PARSER_XBOXONE_H
