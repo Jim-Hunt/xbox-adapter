@@ -771,10 +771,16 @@ void XBOXONEBTSSP::HCI_task()
 
       case HCI_CHECK_DISC_BDADDR_STATE:
          // Serial1.print(F("Incoming address: "));
-         for (int8_t i = 5; i > 0; i--) {
-            // Serial1.print(disc_bdaddr[i], HEX);
-            // Serial1.print(F(":"));
-         }
+         // Serial1.print(disc_bdaddr[5], HEX);
+         // Serial1.print(F(":"));
+         // Serial1.print(disc_bdaddr[4], HEX);
+         // Serial1.print(F(":"));
+         // Serial1.print(disc_bdaddr[3], HEX);
+         // Serial1.print(F(":"));
+         // Serial1.print(disc_bdaddr[2], HEX);
+         // Serial1.print(F(":"));
+         // Serial1.print(disc_bdaddr[1], HEX);
+         // Serial1.print(F(":"));
          // Serial1.println(disc_bdaddr[0], HEX);
 
          /* Check if the device is already paired. */
